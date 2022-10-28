@@ -1,0 +1,11 @@
+Node.js API From Scratch Using TypeScript, Express And MongoDB #1
+https://www.youtube.com/watch?v=1o9YOHeKhNQ
+https://github.com/JasonMerrett/nodejs-api-from-scratch
+
+Blog Application with Typescript
+https://www.youtube.com/watch?v=zKYPAEmEp50&list=PLdSnLYEzOTtqWFNLg7M8iwhOBROHKXWIp&index=4
+https://github.com/joeythelantern/MERN-Stack-Typescript-Blog
+
+Extend Express Request object in TypeScript
+https://www.youtube.com/watch?v=kwRrCX3xIyE
+https://blog.logrocket.com/extend-express-request-object-typescript/
