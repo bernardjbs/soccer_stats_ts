@@ -9,3 +9,9 @@ https://github.com/joeythelantern/MERN-Stack-Typescript-Blog
 Extend Express Request object in TypeScript
 https://www.youtube.com/watch?v=kwRrCX3xIyE
 https://blog.logrocket.com/extend-express-request-object-typescript/
+
+how to use multiple tsconfig files (with conflicting compiler options)?
+https://stackoverflow.com/questions/61611311/how-to-use-multiple-tsconfig-files-with-conflicting-compiler-options
+
+Module has no exported member error in TypeScript
+https://bobbyhadz.com/blog/typescript-module-has-no-exported-member

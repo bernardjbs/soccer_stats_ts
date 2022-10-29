@@ -5,6 +5,8 @@ import typeDefs from './schemas/typeDefs.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
+import authMiddleware  from './utils/auth.js';
+// import signToken  from './utils/auth.js';
 
 import db from './config/connection.js';
 
@@ -23,20 +25,24 @@ app.use(express.json());
 
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: authMiddleware
 });
+
+app.use(express.urlencoded({ extended: true }));
+
 
 // Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async () => {
   await server.start();
   server.applyMiddleware({ app });
-  
+
   db.once('open', () => {
     app.listen(PORT, () => {
       console.log(`API server running on port ${PORT}!`);
       console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
-    })
-  }) 
-  };
+    });
+  });
+};
 
 startApolloServer();
