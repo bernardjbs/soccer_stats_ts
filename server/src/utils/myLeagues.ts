@@ -1,0 +1,23 @@
+export const myLeagues = [
+  { country: 'BRAZIL', competition: 'Serie A' },
+  { country: 'CHILE', competition: 'Primera Division' },
+  { country: 'ENGLAND', competition: 'Premier League' },
+  { country: 'ENGLAND', competition: 'Championship' },
+  { country: 'ENGLAND', competition: 'League One' },
+  { country: 'FRANCE', competition: 'Ligue 1' },
+  { country: 'FRANCE', competition: 'Ligue 2' },
+  { country: 'GERMANY', competition: 'Bundesliga' },
+  { country: 'GREECE', competition: 'Super League' },
+  { country: 'ITALY', competition: 'Serie A' },
+  { country: 'ITALY', competition: 'Coppa Italia' },
+  { country: 'NETHERLANDS', competition: 'Eredivisie' },
+  { country: 'PERU', competition: 'Liga 1 - Clausura' },
+  { country: 'PORTUGAL', competition: 'Liga Portugal' },
+  { country: 'SPAIN', competition: 'LaLiga' },
+  { country: 'EUROPE', competition: 'Champions League - Group Stage' },
+  { country: 'EUROPE', competition: 'Champions League - Qualification' },
+  { country: 'EUROPE', competition: 'Champions League - Play Offs' },
+  { country: 'EUROPE', competition: 'Europa Conference League - Group Stage' },
+  { country: 'EUROPE', competition: 'Europa Conference League - Qualification' },
+  { country: 'EUROPE', competition: 'Europa Conference League - Play Offs' }
+];

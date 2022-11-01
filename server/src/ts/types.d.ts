@@ -2,6 +2,7 @@ import { ResultInterface } from './interfaces';
 
 export type Match = {
   matchId: string;
+  matchCompetition: string,
   matchStart: Date;
   homeTeam: string;
   awayTeam: string;
