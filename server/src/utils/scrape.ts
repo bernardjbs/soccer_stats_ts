@@ -1,11 +1,12 @@
 import playwright from 'playwright';
-import { MatchStatsInterface } from '../ts/interfaces';
-import { MongoClient } from 'mongodb';
+import { MatchStatsInterface, ResultInterface } from '../ts/interfaces';
+import util from 'util';
 import colors from 'colors.ts';
 import { random } from '../utils/helpers.js';
-import { Match, OverallStats, HomeStats, AwayStats } from '../ts/types';
+import { Match } from '../ts/types';
 import { saveMatch } from './scrapeController.js';
 import { myLeagues } from './myLeagues.js';
+import { delay, strToDateTime } from '../utils/helpers.js';
 
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -16,132 +17,147 @@ dotenv.config({
   path: path.resolve(__dirname, '../../../.env')
 });
 
-export const delay = (time: number) => {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, time);
-  });
-};
 
 const match = async (matchId: string) => {
+
   const browser = await playwright.chromium.launch({
     headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
-  await page.goto(`https://www.flashscore.com/match/${matchId}/#/h2h/overall`); //Germany
+  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary`); //Germany
 
-  const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':');
+  const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':')
   console.log(`match starts at: ${matchStart}`);
-  const homeTeam: string = await page.locator('.duelParticipant__home').locator('div').locator('div').nth(2).innerText();
-  const awayTeam: string = await page.locator('.duelParticipant__away').locator('div').locator('div').nth(1).innerText();
+  const homeTeam: string = await page.locator('.duelParticipant__home').locator('div').locator('div').nth(2).innerText()
+  const awayTeam: string = await page.locator('.duelParticipant__away').locator('div').locator('div').nth(1).innerText()
 
-  const matchCompetition = await page.locator('.tournamentHeader__country').innerText();
-  console.log(`match competition: ${matchCompetition}`);
   let hotStat: string = '';
 
   try {
-    await page.locator('a[href="#/match-summary"]').click();
     const previewBlocks = page.locator('.previewOpenBlock').locator('div');
     await page.locator('.previewShowMore').click({ timeout: 3000 });
-    hotStat = await previewBlocks.nth(5).innerText();
+    hotStat = await previewBlocks.nth(5).innerText()
+    console.log(`Hot stat: ${hotStat}`)
   } catch (err) {
     hotStat = 'Hot Stats is not available for this match';
     console.log('Hot Stats is not available for this match');
   }
 
-  const context = await browser.newContext();
-  const overallPage = await context.newPage();
-  const homePage = await context.newPage();
-  const awayPage = await context.newPage();
+  //******* OVERALL MATCHES ******/
+  // Go to H2H Section - Default is on Overall Matches
+  await page.locator('a[href="#/h2h"]').click();
+  const overallHomeElems = page.locator(".h2h").locator(".h2h__section").nth(0);
+  const overallAwayElems = page.locator(".h2h").locator(".h2h__section").nth(1);
+  const overallH2hElems = page.locator(".h2h").locator(".h2h__section").nth(2);
 
-  const overallStats: OverallStats = await matchH2H(matchId, 'overall', overallPage);
-  await overallPage.close();
+  // Wait for locator to load before proceeding
+  await overallHomeElems.waitFor();
 
-  const homeStats: HomeStats = await matchH2H(matchId, 'home', homePage);
-  await homePage.close();
+  // Get previous stats for overall HOME matches
+  const overallHomeStats = await getStats(overallHomeElems, page, 'Overall last matches for Home');
+  await overallAwayElems.waitFor();
 
-  const awayStats: AwayStats = await matchH2H(matchId, 'away', awayPage);
-  await awayPage.close();
+  // Get previous stats for overall AWAY matches
+  const overallAwayStats = await getStats(overallAwayElems, page, 'Overall last matches for Away');
+  await overallH2hElems.waitFor();
 
+  // Get previous stats for overall H2H matches
+  const overallH2hStats = await getStats(overallH2hElems, page, 'Overall last matches for Head to Head');
+
+  //******* HOME MATCHES ******/
+  // Go to Home Matches
+  await page.locator('a[href="#/h2h/home"]').click();
+  const homeElems = page.locator(".h2h").locator(".h2h__section").nth(0);
+
+  // Wait for locator to load before proceeding
+  await homeElems.waitFor();
+
+  // Get previous stats for HOME matches
+  const homeStats = await getStats(homeElems, page, 'Home team last matches');
+
+  //******* AWAY MATCHES ******/
+  // Go to Away Matches
+  await page.locator('a[href="#/h2h/away"]').click();
+  const awayElems = page.locator(".h2h").locator(".h2h__section").nth(0);
+
+  // Wait for locator to load before proceeding
+  await awayElems.waitFor();
+
+  // Get previous stats for AWAY matches
+  const awayStats = await getStats(awayElems, page, 'Away team last matches');
+
+  //******* DIRECT HEAD TO HEAD MATCHES ******/
+  const directH2hElems = page.locator(".h2h").locator(".h2h__section").nth(1);
+  const directH2hStats = await getStats(directH2hElems, page, 'Direct Head to Head');
+
+  // Build the match Object
   let match: Match = {
     matchId: matchId,
-    matchCompetition: matchCompetition,
     matchStart: matchStart,
     homeTeam: homeTeam,
     awayTeam: awayTeam,
     hotStat: hotStat,
-    overallStats: overallStats,
+    overallHomeStats: overallHomeStats,
+    overallAwayStats: overallAwayStats,
+    overallH2hStats: overallH2hStats,
     homeStats: homeStats,
-    awayStats: awayStats
+    awayStats: awayStats,
+    directH2hStats: directH2hStats,
   };
+  // console.log(util.inspect(match, { colors: true, depth: 4 }));
+  console.log('Save to Database');
   saveMatch(match);
   await browser.close();
-};
+}
 
-export const strToDateTime = (str: string, dateSeparator: string, timeSeparator: string) => {
-  const [dateComponents, timeComponents] = str.split(' ');
-  const [day, month, year] = dateComponents.split(dateSeparator);
-  if (timeSeparator == '') {
-    return new Date(+year, parseInt(month) - 1, +day);
-  } else {
-    const [hours, minutes] = timeComponents.split(timeSeparator);
-    return new Date(+year, parseInt(month) - 1, +day, +hours, +minutes);
-  }
-};
-
-// wldIdx is used to get the row number for either Overall, Home team and Away team stats
-export const results = async (matches: playwright.Locator, page: playwright.Page, wldIdx: number) => {
-  const matchRow3 = page.locator(`//div[contains(@class, 'h2h__section')][${wldIdx}]`).locator("//div[contains(@class, 'h2h__row')]");
-  let tempH2Harr = [];
+const getStats = async (matches: playwright.Locator, page: playwright.Page, lastMatchesType: string) => {
+  let statsCollection: ResultInterface[] = [];
+  const matchCollection = matches.locator(".rows").locator(".h2h__row");
+  const count = await matchCollection.count();
+  console.log(`We have ${count} in ${lastMatchesType}`);
   let outcome;
-  const count = await matches.count();
   for (let i = 0; i < count; i++) {
-    const match = matches.nth(i);
-    await delay(1000);
+    const homeTeam = await matchCollection.nth(i).locator(".h2h__homeParticipant").innerText();
+    const awayTeam = await matchCollection.nth(i).locator(".h2h__awayParticipant").innerText();
+    const competition = await matchCollection.nth(i).locator(".h2h__event").getAttribute("title");
+    const homeTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).innerText();
+    const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();
 
-    const competition = await match.locator('.h2h__event').getAttribute('title');
-    const homeTeam = await match.locator('.h2h__homeParticipant').innerText();
-    const awayTeam = await match.locator('.h2h__awayParticipant').innerText();
-    const homeTeamScore = await match.locator('.h2h__result').locator('span').nth(0).innerText();
-    const awayTeamScore = await match.locator('.h2h__result').locator('span').nth(1).innerText();
-    console.log('Processing Head to Heads... ');
-
-    if (matches.toString() !== matchRow3.toString()) {
-      outcome = await match.locator('.wld').innerText();
+    if (await matchCollection.nth(i).locator('.wld').count() > 0) {
+      outcome = await matchCollection.nth(i).locator('.wld').innerText();
+    }
+    else {
+      outcome = "N/A";
     }
 
-    const [matchSummary] = await Promise.all([page.waitForEvent('popup'), await match.click()]);
-
+    const [matchSummary] = await Promise.all([page.waitForEvent('popup'), await matchCollection.nth(i).click()]);
     await matchSummary.waitForLoadState();
 
-    // Exit loop if there is no stats available
     const statsElCount = await matchSummary.locator('a[href="#/match-summary/match-statistics"]').count();
-    if (statsElCount < 1) {
-      await matchSummary.close();
-      continue;
+    let matchStats: MatchStatsInterface[] = [];
+    if (statsElCount > 0) {
+      await matchSummary.locator('a[href="#/match-summary/match-statistics"]').click();
+      await delay(1000);
+      const statsCategory = matchSummary.locator('.stat__categoryName');
+      const statsHome = matchSummary.locator('.stat__homeValue');
+      const statsAway = matchSummary.locator('.stat__awayValue');
+      const statsCount = await statsCategory.count();
+      console.log(statsCount);
+      for (let i = 0; i < statsCount; i++) {
+        let tempStat: MatchStatsInterface = {
+          categoryStat: await statsCategory.nth(i).innerText(),
+          homeStat: await statsHome.nth(i).innerText(),
+          awayStat: await statsAway.nth(i).innerText()
+        };
+        matchStats.push(tempStat);
+      }
     }
 
-    await matchSummary.locator('a[href="#/match-summary/match-statistics"]').click();
-    await delay(1000);
     const date = await matchSummary.locator('.duelParticipant__startTime').innerText();
 
-    const statsCategory = matchSummary.locator('.stat__categoryName');
-    const statsHome = matchSummary.locator('.stat__homeValue');
-    const statsAway = matchSummary.locator('.stat__awayValue');
-    const statsCount = await statsCategory.count();
-
-    let matchStats: MatchStatsInterface[] = [];
-    for (let i = 0; i < statsCount; i++) {
-      let tempStat: MatchStatsInterface = {
-        categoryStat: await statsCategory.nth(i).innerText(),
-        homeStat: await statsHome.nth(i).innerText(),
-        awayStat: await statsAway.nth(i).innerText()
-      };
-      matchStats.push(tempStat);
-    }
-
-    const tempH2Hobj = {
-      date: strToDateTime(date, '.', ''),
+    const tempH2Hobj: ResultInterface = {
+      date: strToDateTime(date, '.', ':'),
       competition: competition,
       homeTeam: homeTeam,
       awayTeam: awayTeam,
@@ -150,47 +166,15 @@ export const results = async (matches: playwright.Locator, page: playwright.Page
       outcome: outcome,
       matchStats: matchStats
     };
-    // tempH2Harr.push(JSON.stringify(tempH2Hobj));
-    tempH2Harr.push(tempH2Hobj);
+
+    statsCollection.push(tempH2Hobj)
     await matchSummary.close();
+
   }
-  return tempH2Harr;
-};
+  console.log(util.inspect(statsCollection, { colors: true, depth: 4 }));
 
-export const matchH2H = async (matchId: string, tab: string, page: playwright.Page) => {
-  let stats: any;
-  if (tab === 'overall') {
-    await page.goto(`https://www.flashscore.com/match/${matchId}/#/h2h/${tab}`);
-    const Row1_Matches = page.locator("//div[contains(@class, 'h2h__section')][1]").locator("//div[contains(@class, 'h2h__row')]");
-    const Row2_Matches = page.locator("//div[contains(@class, 'h2h__section')][2]").locator("//div[contains(@class, 'h2h__row')]");
-    const Row3_Matches = page.locator("//div[contains(@class, 'h2h__section')][3]").locator("//div[contains(@class, 'h2h__row')]");
-
-    stats = {
-      overallHome_lastMatches: await results(Row1_Matches, page, 3),
-      overallAway_lastMatches: await results(Row2_Matches, page, 3),
-      overallH2H: await results(Row3_Matches, page, 3)
-    };
-  } else if (tab === 'home') {
-    await page.goto(`https://www.flashscore.com/match/${matchId}/#/h2h/${tab}`);
-    const Row1_Matches = page.locator("//div[contains(@class, 'h2h__section')][1]").locator("//div[contains(@class, 'h2h__row')]");
-    const Row2_Matches = page.locator("//div[contains(@class, 'h2h__section')][2]").locator("//div[contains(@class, 'h2h__row')]");
-    stats = {
-      lastMatchesHome: await results(Row1_Matches, page, 2),
-      lastMatchesH2H: await results(Row2_Matches, page, 2)
-    };
-  } else {
-    await page.goto(`https://www.flashscore.com/match/${matchId}/#/h2h/${tab}`);
-    const Row1_Matches = page.locator("//div[contains(@class, 'h2h__section')][1]").locator("//div[contains(@class, 'h2h__row')]");
-    const Row2_Matches = page.locator("//div[contains(@class, 'h2h__section')][2]").locator("//div[contains(@class, 'h2h__row')]");
-    stats = {
-      lastMatchesAway: await results(Row1_Matches, page, 2),
-      lastMatchesH2H: await results(Row2_Matches, page, 2)
-    };
-  }
-  return stats;
-};
-
-
+  return statsCollection
+}
 
 const setFavMatches = async (eventHeader: playwright.Locator) => {
   const eventHeader_count = await eventHeader.count();

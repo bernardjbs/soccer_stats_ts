@@ -13,7 +13,6 @@ export const delay = (time: number) => {
 export const strToDateTime = (str: string, dateSeparator: string, timeSeparator: string) => {
   const [dateComponents, timeComponents] = str.split(' ');
   const [day, month, year] = dateComponents.split(dateSeparator);
-  console.log(`the year is: ${year}`);
   if (timeSeparator == '') {
     return new Date(+year, parseInt(month) - 1, +day);
   } else {
