@@ -3,6 +3,7 @@ import { ResultInterface } from './interfaces';
 export type Match = {
   matchId: string,
   matchStart: Date,
+  competition: string,
   homeTeam: string,
   awayTeam: string,
   hotStat: string,

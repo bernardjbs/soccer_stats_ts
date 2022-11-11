@@ -1,3 +1,6 @@
+import util from 'util';
+
+
 export const random = (min:number, max:number) => {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -21,6 +24,8 @@ export const strToDateTime = (str: string, dateSeparator: string, timeSeparator:
   }
 };
 
-
+export const jsonConsole = (object: {}, depth: number) => {
+  return console.log(util.inspect(object, { colors: true, depth: depth }));
+}
 
 

@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node build/server.js",
     "dev": "tsc-watch --onSuccess \"node ./build/server.js\"",
-    "compile-match": "cd build/scrape && node match.js"
+    "compile-match": "cd build/scrape && node match.js", 
+    "analyse": "cd build/scrape/analyse && node index.js"
   },
   "keywords": [],
   "author": "",

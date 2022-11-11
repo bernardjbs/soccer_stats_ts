@@ -1,12 +1,11 @@
 import playwright from 'playwright';
 import { MatchStatsInterface, ResultInterface } from '../ts/interfaces';
 import util from 'util';
-import colors from 'colors.ts';
-import { random } from '../utils/helpers.js';
+import Colors from 'colors.ts';
+import { random, delay, strToDateTime } from '../utils/helpers.js';
 import { Match } from '../ts/types';
 import { saveMatch } from './scrapeController.js';
 import { myLeagues } from './myLeagues.js';
-import { delay, strToDateTime } from '../utils/helpers.js';
 
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -17,6 +16,7 @@ dotenv.config({
   path: path.resolve(__dirname, '../../../.env')
 });
 
+Colors.enable();
 
 const match = async (matchId: string) => {
 
@@ -25,12 +25,13 @@ const match = async (matchId: string) => {
   });
 
   const page = await browser.newPage();
-  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary`); //Germany
+  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary`); 
 
   const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':')
-  console.log(`match starts at: ${matchStart}`);
-  const homeTeam: string = await page.locator('.duelParticipant__home').locator('div').locator('div').nth(2).innerText()
-  const awayTeam: string = await page.locator('.duelParticipant__away').locator('div').locator('div').nth(1).innerText()
+  const homeTeam: string = await page.locator('.duelParticipant__home').innerText()
+  const awayTeam: string = await page.locator('.duelParticipant__away').innerText()
+  const competition: string = await page.locator('.tournamentHeader__country').innerText();
+  console.log(`\n${competition} - ${homeTeam} vs ${awayTeam} *** match starts at: ${matchStart}`.red.bg_green);
 
   let hotStat: string = '';
 
@@ -95,6 +96,7 @@ const match = async (matchId: string) => {
   let match: Match = {
     matchId: matchId,
     matchStart: matchStart,
+    competition: competition,
     homeTeam: homeTeam,
     awayTeam: awayTeam,
     hotStat: hotStat,
@@ -115,7 +117,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
   let statsCollection: ResultInterface[] = [];
   const matchCollection = matches.locator(".rows").locator(".h2h__row");
   const count = await matchCollection.count();
-  console.log(`We have ${count} in ${lastMatchesType}`);
+  console.log(`Scraping ${lastMatchesType} (${count})...`);
   let outcome;
   for (let i = 0; i < count; i++) {
     const homeTeam = await matchCollection.nth(i).locator(".h2h__homeParticipant").innerText();
@@ -128,7 +130,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
       outcome = await matchCollection.nth(i).locator('.wld').innerText();
     }
     else {
-      outcome = "N/A";
+      outcome = "N/A"
     }
 
     const [matchSummary] = await Promise.all([page.waitForEvent('popup'), await matchCollection.nth(i).click()]);
@@ -143,7 +145,6 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
       const statsHome = matchSummary.locator('.stat__homeValue');
       const statsAway = matchSummary.locator('.stat__awayValue');
       const statsCount = await statsCategory.count();
-      console.log(statsCount);
       for (let i = 0; i < statsCount; i++) {
         let tempStat: MatchStatsInterface = {
           categoryStat: await statsCategory.nth(i).innerText(),
@@ -171,7 +172,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
     await matchSummary.close();
 
   }
-  console.log(util.inspect(statsCollection, { colors: true, depth: 4 }));
+  // console.log(util.inspect(statsCollection, { colors: true, depth: 4 }));
 
   return statsCollection
 }
@@ -218,7 +219,6 @@ export const getMatchIds = async (day: string) => {
   const SNDivsCount = await sportNameDivs.count();
   delay(5000);
 
-  console.log(`sportDivCount: ${SNDivsCount}`.red);
   let matchIds = [];
   const eventHeader = page.locator("xpath=//div[contains(@class, 'event__header')] ");
 

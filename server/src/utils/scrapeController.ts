@@ -11,10 +11,10 @@ export const saveMatch = async (match: Match) => {
 
     // console.log(matches);
     // create a document to insert
-    const result = await matches.insertOne(match);
-    // const result = await matches.updateOne({ matchId: match.matchId }, { $setOnInsert: match }, { upsert: true });
+    // const result = await matches.insertOne(match);
+    const result = await matches.updateOne({ matchId: match.matchId }, { $setOnInsert: match }, { upsert: true });
 
-    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+    console.log(`A document was inserted with the _id: ${result.upsertedId}`);
   } finally {
     // await client.close();
   }
