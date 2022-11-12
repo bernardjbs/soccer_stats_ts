@@ -229,24 +229,19 @@ export const getMatchIds = async (day: string) => {
   let star_class;
   for (let i = 0; i < SNDivsCount; i++) {
     const idElem = await sportNameDivs.nth(i).getAttribute('id');
-    // const star_class = await eventHeader.locator('div').nth(0).locator('span').locator('svg').getAttribute('class')
     const starCount = await sportNameDivs.nth(i).locator('div').nth(0).locator('span').locator('svg').count();
     if (starCount > 0) {
       star_class = await sportNameDivs.nth(i).locator('div').nth(0).locator('span').locator('svg').getAttribute('class');
-      console.log(star_class);
+      console.log(`Getting Match IDs for competition...`);
     }
 
     if (star_class === 'star-ico eventStar eventStar--active' && idElem) {
-      console.log(idElem);
+      console.log(`id ${idElem}`);
       matchIds.push(idElem.substring(4));
-      // console.log('add match id')
     } else if (star_class === 'star-ico eventStar ') {
       break;
-      console.log('break');
     }
   }
-
-  console.log(matchIds);
   browser.close();
   return matchIds;
 };
