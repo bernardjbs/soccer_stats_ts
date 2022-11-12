@@ -11,6 +11,6 @@ export interface ResultInterface {
 
 export interface MatchStatsInterface {
   categoryStat: string,
-  homeStat: string,
-  awayStat: string,
+  homeStat: number,
+  awayStat: number,
 };

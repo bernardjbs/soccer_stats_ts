@@ -2,7 +2,7 @@ import { ResultInterface } from '../../ts/interfaces';
 import { Match } from '../../ts/types';
 import { MongoClient } from 'mongodb';
 
-import { jsonConsole } from '../../utils/helpers.js';
+import { dateToStr } from '../../utils/helpers.js';
 import Colors from 'colors.ts';
 Colors.enable();
 
@@ -19,6 +19,7 @@ const client = new MongoClient(process.env.MONGODB_URI!);
 const DB_NAME = process.env.DB_NAME;
 const MATCHES_COLLECTION = process.env.MATCHES_COLLECTION;
 
+// Fetch the matches to be analysed from database
 const getMatches = async () => {
   const database = client.db(DB_NAME);
   const matchesCollection = database.collection(MATCHES_COLLECTION!);
@@ -33,22 +34,6 @@ const getMatches = async () => {
   return matches;
 };
 
-export const analyseMatches = async () => {
-  try {
-    const matches: Match[] = await getMatches();
-    matches.map((match: Match) => {
-      console.log(`\n${match.homeTeam} VS ${match.awayTeam}`.red);
-      analyseBTTS(match);
-      analyseOver(match);
-      analyseUnder(match);
-      analyseWinner(match);
-    });
-  } catch (error) {
-    console.log(error);
-  } finally {
-    await client.close();
-  }
-};
 
 const getTotalAvgGoals = (match: Match) => {
   const calcAvgGoals = (stats: ResultInterface[]): number => {
@@ -76,13 +61,17 @@ const getTotalAvgGoals = (match: Match) => {
 };
 
 // Function to calculate head to head winners
-const calcH2hWinner = (stats: ResultInterface[]) => {
+const calcH2hWinner = (stats: ResultInterface[], matchHomeTeam: string, matchAwayTeam: string) => {
   let homeWinCount = 0;
   let awayWinCount = 0;
   stats.map((stat) => {
-    if (stat.homeTeamScore > stat.awayTeamScore) {
+    if (matchHomeTeam == stat.homeTeam && (stat.homeTeamScore > stat.awayTeamScore)) {
       homeWinCount = homeWinCount + 1;
-    } else if (stat.homeTeamScore < stat.awayTeamScore) {
+    } else if (matchHomeTeam == stat.awayTeam && (stat.homeTeamScore < stat.awayTeamScore)) {
+      homeWinCount = homeWinCount + 1;
+    } else if (matchAwayTeam == stat.homeTeam && (stat.homeTeamScore > stat.awayTeamScore)) {
+      awayWinCount = awayWinCount + 1;
+    }else if (matchAwayTeam == stat.awayTeam && (stat.homeTeamScore < stat.awayTeamScore)) {
       awayWinCount = awayWinCount + 1;
     }
   });
@@ -128,6 +117,52 @@ const calcAnalysis = (type: string, stats: ResultInterface[]) => {
   } else {
     return 0;
   }
+};
+
+// Function to calculate yellow cards
+const calcYellow = (stats: ResultInterface[]) => {
+  let count: number = 0;
+  let cardCount: number = 0;
+  let btYellowCount: number = 0;
+  stats.map((stat) => {
+    if (stat.matchStats.length > 0) {
+      const matchStats = stat.matchStats;
+      matchStats.map((matchStat) => {
+        if (matchStat.categoryStat === 'Yellow Cards') {
+          count = count + 1;
+          cardCount = cardCount + (matchStat.homeStat + matchStat.awayStat);
+          if (matchStat.homeStat > 0 && matchStat.awayStat > 0) {
+            btYellowCount = btYellowCount + 1;
+          }
+        }
+      });
+    }
+  });
+  const avgYellow = cardCount / count;
+  const pcBTyellow = (btYellowCount / count) * 100;
+  return {
+    avgYellow: avgYellow,
+    pcBTyellow: pcBTyellow
+  };
+};
+
+// Function to calculate corners
+const calcCorners = (stats: ResultInterface[]) => {
+  let count: number = 0;
+  let cornerCount: number = 0;
+  stats.map((stat) => {
+    if (stat.matchStats.length > 0) {
+      const matchStats = stat.matchStats;
+      matchStats.map((matchStat) => {
+        if (matchStat.categoryStat === 'Corner Kicks') {
+          count = count + 1;
+          cornerCount = cornerCount + (matchStat.homeStat + matchStat.awayStat);
+        }
+      });
+    }
+  });
+  const avgCorner = cornerCount / count;
+  return { avgCorner: avgCorner };
 };
 
 // Function to analyse Both team to score
@@ -177,11 +212,61 @@ const analyseUnder = (match: Match) => {
 // Function to analyse head to head winners
 const analyseWinner = (match: Match) => {
   // Winners
-  const overallH2hWinner = calcH2hWinner(match.overallH2hStats);
+  const overallH2hWinner = calcH2hWinner(match.overallH2hStats, match.homeTeam, match.awayTeam);
   if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'home') console.log(`OVERALL - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.blue);
   if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'away') console.log(`OVERALL - ${match.awayTeam} WON ${match.homeTeam} at least 4/5 times`.blue);
 
-  const H2H_WINNER_score = calcH2hWinner(match.directH2hStats);
+  const H2H_WINNER_score = calcH2hWinner(match.directH2hStats, match.homeTeam, match.awayTeam);
   if (H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'home') console.log(`DIRECT H2H - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.bg_green);
   if (H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'away') console.log(`DIRECT H2H - ${match.awayTeam} WON ${match.homeTeam} at least 4/5 times`.bg_green);
+};
+
+// Function to calculate yellow cards
+const analyseYellow = (match: Match) => {
+  const homeYellow = calcYellow(match.homeStats);
+  const awayYellow = calcYellow(match.awayStats);
+  const overallHomeYellow = calcYellow(match.overallHomeStats);
+  const overallAwayYellow = calcYellow(match.overallAwayStats);
+  const overallH2hYellow = calcYellow(match.overallH2hStats);
+  const directH2hYellow = calcYellow(match.directH2hStats);
+
+  const pcBTyellow = (homeYellow.pcBTyellow + awayYellow.pcBTyellow + overallHomeYellow.pcBTyellow + overallAwayYellow.pcBTyellow + overallH2hYellow.pcBTyellow + directH2hYellow.pcBTyellow) / 6;
+
+  const avgYellow = (homeYellow.avgYellow + awayYellow.avgYellow + overallHomeYellow.avgYellow + overallAwayYellow.avgYellow + overallH2hYellow.avgYellow + directH2hYellow.avgYellow) / 6;
+
+  if (avgYellow > 0 || pcBTyellow > 0) console.log(`Percentage BT Yellow: ${pcBTyellow.toFixed(2)}% - Average Yellow Cards: ${avgYellow.toFixed(2)}`.yellow.bold);
+};
+
+// Function to calculate corners
+const analyseCorner = (match: Match) => {
+  const homeCorners = calcCorners(match.homeStats).avgCorner;
+  const awayCorners = calcCorners(match.awayStats).avgCorner;
+  const overallHomeCorners = calcCorners(match.overallHomeStats).avgCorner;
+  const overallAwayCorners = calcCorners(match.overallAwayStats).avgCorner;
+  const overallH2hCorners = calcCorners(match.overallH2hStats).avgCorner;
+  const directH2hCorners = calcCorners(match.directH2hStats).avgCorner;
+
+  const avgCorner = (homeCorners + awayCorners + overallHomeCorners + overallAwayCorners + overallH2hCorners + directH2hCorners) / 6;
+
+  if (avgCorner > 0) console.log(`Average corners: ${avgCorner.toFixed(2)}`.cyan.bold);
+};
+
+// MAIN FUNCTION - Analyse the matches
+export const analyseMatches = async () => {
+  try {
+    const matches: Match[] = await getMatches();
+    matches.map((match: Match) => {
+      console.log(`\n${match.homeTeam} VS ${match.awayTeam} | STARTING ${dateToStr(match.matchStart)}`.red);
+      analyseBTTS(match);
+      analyseOver(match);
+      analyseUnder(match);
+      analyseWinner(match);
+      analyseYellow(match);
+      analyseCorner(match);
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
 };

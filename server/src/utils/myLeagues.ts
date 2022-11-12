@@ -12,6 +12,7 @@ export const myLeagues = [
   { country: 'ITALY', competition: 'Coppa Italia' },
   { country: 'NETHERLANDS', competition: 'Eredivisie' },
   { country: 'PERU', competition: 'Liga 1 - Clausura' },
+  { country: 'POLAND', competition: 'Ekstraklasa' },
   { country: 'PORTUGAL', competition: 'Liga Portugal' },
   { country: 'SPAIN', competition: 'LaLiga' },
   { country: 'EUROPE', competition: 'Champions League - Group Stage' },

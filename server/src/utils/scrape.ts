@@ -148,8 +148,8 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
       for (let i = 0; i < statsCount; i++) {
         let tempStat: MatchStatsInterface = {
           categoryStat: await statsCategory.nth(i).innerText(),
-          homeStat: await statsHome.nth(i).innerText(),
-          awayStat: await statsAway.nth(i).innerText()
+          homeStat: parseInt(await statsHome.nth(i).innerText()),
+          awayStat: parseInt(await statsAway.nth(i).innerText())
         };
         matchStats.push(tempStat);
       }

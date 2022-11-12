@@ -24,6 +24,17 @@ export const strToDateTime = (str: string, dateSeparator: string, timeSeparator:
   }
 };
 
+export const dateToStr = (dateVal: Date) => {
+  return new Date(dateVal).toLocaleDateString('en-GB', {
+    weekday: 'short', // long, short, narrow
+    day: 'numeric', // numeric, 2-digit
+    year: 'numeric', // numeric, 2-digit
+    month: 'long', // numeric, 2-digit, long, short, narrow
+    hour: 'numeric', // numeric, 2-digit
+    minute: 'numeric' // numeric, 2-digit
+  });
+};
+
 export const jsonConsole = (object: {}, depth: number) => {
   return console.log(util.inspect(object, { colors: true, depth: depth }));
 }
