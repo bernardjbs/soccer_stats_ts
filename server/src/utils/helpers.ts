@@ -1,11 +1,9 @@
 import util from 'util';
 
-
 export const random = (min:number, max:number) => {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-
 
 export const delay = (time: number) => {
   return new Promise(function (resolve) {
@@ -37,6 +35,4 @@ export const dateToStr = (dateVal: Date) => {
 
 export const jsonConsole = (object: {}, depth: number) => {
   return console.log(util.inspect(object, { colors: true, depth: depth }));
-}
-
-
+};

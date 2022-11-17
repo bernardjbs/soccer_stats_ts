@@ -17,5 +17,5 @@ export const saveMatch = async (match: Match) => {
     console.log(`A document was inserted with the _id: ${result.upsertedId}`);
   } finally {
     // await client.close();
-  }
+  };
 };

@@ -54,7 +54,7 @@ const getTotalAvgGoals = (match: Match) => {
   let allStatsCount: number = 6;
   if (match.directH2hStats.length < 1) {
     allStatsCount = 5;
-  }
+  };
 
   const totalAvgGoals = (homeAvgGoals + awayAvgGoals + overallHomeAvgGoals + overallAwayAvgGoals + overallH2hAvgGoals + directH2hAvgGoals) / allStatsCount;
   return totalAvgGoals;
@@ -73,7 +73,7 @@ const calcH2hWinner = (stats: H2hInterface[], matchHomeTeam: string, matchAwayTe
       awayWinCount = awayWinCount + 1;
     }else if (matchAwayTeam == stat.awayTeam && (stat.homeTeamScore < stat.awayTeamScore)) {
       awayWinCount = awayWinCount + 1;
-    }
+    };
   });
   if (homeWinCount > 3) {
     return {
@@ -89,7 +89,7 @@ const calcH2hWinner = (stats: H2hInterface[], matchHomeTeam: string, matchAwayTe
     return {
       score: 0
     };
-  }
+  };
 };
 
 // Function to calculate analysis types
@@ -99,24 +99,24 @@ const calcAnalysis = (type: string, stats: H2hInterface[]) => {
     if (type == 'calcBTTS') {
       if (stat.homeTeamScore > 0 && stat.awayTeamScore > 0) {
         count = count + 1;
-      }
+      };
     } else if (type == 'calcOver') {
       if (stat.homeTeamScore + stat.awayTeamScore > 2) {
         count = count + 1;
-      }
+      };
     } else if (type == 'calcUnder') {
       if (stat.homeTeamScore + stat.awayTeamScore < 3) {
         count = count + 1;
-      }
+      };
     } else {
       console.log('Could not perform analysis'.red);
-    }
+    };
   });
   if (count > 3) {
     return 1;
   } else {
     return 0;
-  }
+  };
 };
 
 // Function to calculate yellow cards
@@ -133,8 +133,8 @@ const calcYellow = (stats: H2hInterface[]) => {
           cardCount = cardCount + (matchStat.homeStat + matchStat.awayStat);
           if (matchStat.homeStat > 0 && matchStat.awayStat > 0) {
             btYellowCount = btYellowCount + 1;
-          }
-        }
+          };
+        };
       });
     }
   });
@@ -157,7 +157,7 @@ const calcCorners = (stats: H2hInterface[]) => {
         if (matchStat.categoryStat === 'Corner Kicks') {
           count = count + 1;
           cornerCount = cornerCount + (matchStat.homeStat + matchStat.awayStat);
-        }
+        };
       });
     }
   });
@@ -268,5 +268,5 @@ export const analyseMatches = async () => {
     console.log(error);
   } finally {
     await client.close();
-  }
+  };
 };

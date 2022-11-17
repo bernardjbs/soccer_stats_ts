@@ -13,4 +13,4 @@ export type Match = {
   homeStats: H2hInterface[],
   awayStats: H2hInterface[],
   directH2hStats: H2hInterface[],
-}
+};

@@ -5,7 +5,7 @@ import typeDefs from './schemas/typeDefs.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
-import authMiddleware  from './utils/auth.js';
+import authMiddleware from './utils/auth.js';
 // import signToken  from './utils/auth.js';
 
 import db from './config/connection.js';
@@ -30,7 +30,6 @@ const server = new ApolloServer({
 });
 
 app.use(express.urlencoded({ extended: true }));
-
 
 // Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async () => {

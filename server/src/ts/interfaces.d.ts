@@ -14,9 +14,3 @@ export interface MatchStatsInterface {
   homeStat: number,
   awayStat: number,
 };
-
-export interface MatchResultInterfacr {
-  homeTeamScore: number, 
-  awayTeamScore: number, 
-  matchStats: MatchStatsInterface[],
-}
