@@ -1,4 +1,4 @@
-export interface ResultInterface {
+export interface H2hInterface {
   date: Date,
   competition: string | null,
   homeTeam: string,
@@ -14,3 +14,9 @@ export interface MatchStatsInterface {
   homeStat: number,
   awayStat: number,
 };
+
+export interface MatchResultInterfacr {
+  homeTeamScore: number, 
+  awayTeamScore: number, 
+  matchStats: MatchStatsInterface[],
+}

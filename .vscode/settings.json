@@ -1,16 +1,23 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  }, 
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[typescript]": {
-    "editor.formatOnSave": true, 
-    "editor.formatOnPaste": true,
-  }, 
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true
+  },
   "[markdown]": {
-    "editor.formatOnSave": true, 
-    "editor.wordWrap": "on", 
-    "editor.renderWhitespace": "all", 
-    "editor.acceptSuggestionOnEnter": "off",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on",
+    "editor.renderWhitespace": "all",
+    "editor.acceptSuggestionOnEnter": "off"
+  },
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascript",
+    "html": "HTML"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
   }
 }

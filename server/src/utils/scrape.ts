@@ -1,5 +1,5 @@
 import playwright from 'playwright';
-import { MatchStatsInterface, ResultInterface } from '../ts/interfaces';
+import { MatchStatsInterface, H2hInterface } from '../ts/interfaces';
 import util from 'util';
 import Colors from 'colors.ts';
 import { random, delay, strToDateTime } from '../utils/helpers.js';
@@ -114,7 +114,7 @@ const match = async (matchId: string) => {
 }
 
 const getStats = async (matches: playwright.Locator, page: playwright.Page, lastMatchesType: string) => {
-  let statsCollection: ResultInterface[] = [];
+  let statsCollection: H2hInterface[] = [];
   const matchCollection = matches.locator(".rows").locator(".h2h__row");
   const count = await matchCollection.count();
   console.log(`Scraping ${lastMatchesType} (${count})...`);
@@ -157,7 +157,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 
     const date = await matchSummary.locator('.duelParticipant__startTime').innerText();
 
-    const tempH2Hobj: ResultInterface = {
+    const tempH2Hobj: H2hInterface = {
       date: strToDateTime(date, '.', ':'),
       competition: competition,
       homeTeam: homeTeam,
@@ -178,6 +178,8 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 }
 
 const setFavMatches = async (eventHeader: playwright.Locator) => {
+  console.log('Selecting Competitions...'.green.bold);
+  // await delay(60000);
   const eventHeader_count = await eventHeader.count();
 
   for (let i = 0; i < eventHeader_count; i++) {
@@ -201,7 +203,7 @@ const setFavMatches = async (eventHeader: playwright.Locator) => {
       }
     }
   }
-};
+};;
 
 export const getMatchIds = async (day: string) => {
   const browser = await playwright.chromium.launch({
@@ -224,6 +226,8 @@ export const getMatchIds = async (day: string) => {
 
   // Set my matches to favourites
   await setFavMatches(eventHeader);
+
+  console.log('Collecting match ids...'.green.bold);
 
   // Loop through sportDivs and get ids from favourites
   let star_class;
@@ -253,7 +257,6 @@ export const buildStats = async (matchIds: string[], interval: number = random(1
     process.exit();
     return;
   }
-  // await dosomething();
   await match(matchIds[0]);
 
   setTimeout(

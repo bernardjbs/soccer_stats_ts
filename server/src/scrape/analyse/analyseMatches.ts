@@ -1,4 +1,4 @@
-import { ResultInterface } from '../../ts/interfaces';
+import { H2hInterface } from '../../ts/interfaces';
 import { Match } from '../../ts/types';
 import { MongoClient } from 'mongodb';
 
@@ -36,7 +36,7 @@ const getMatches = async () => {
 
 
 const getTotalAvgGoals = (match: Match) => {
-  const calcAvgGoals = (stats: ResultInterface[]): number => {
+  const calcAvgGoals = (stats: H2hInterface[]): number => {
     const statCount = stats.length;
     let totalGoals = 0;
     stats.map((stat) => {
@@ -61,7 +61,7 @@ const getTotalAvgGoals = (match: Match) => {
 };
 
 // Function to calculate head to head winners
-const calcH2hWinner = (stats: ResultInterface[], matchHomeTeam: string, matchAwayTeam: string) => {
+const calcH2hWinner = (stats: H2hInterface[], matchHomeTeam: string, matchAwayTeam: string) => {
   let homeWinCount = 0;
   let awayWinCount = 0;
   stats.map((stat) => {
@@ -93,7 +93,7 @@ const calcH2hWinner = (stats: ResultInterface[], matchHomeTeam: string, matchAwa
 };
 
 // Function to calculate analysis types
-const calcAnalysis = (type: string, stats: ResultInterface[]) => {
+const calcAnalysis = (type: string, stats: H2hInterface[]) => {
   let count = 0;
   stats.map((stat) => {
     if (type == 'calcBTTS') {
@@ -120,7 +120,7 @@ const calcAnalysis = (type: string, stats: ResultInterface[]) => {
 };
 
 // Function to calculate yellow cards
-const calcYellow = (stats: ResultInterface[]) => {
+const calcYellow = (stats: H2hInterface[]) => {
   let count: number = 0;
   let cardCount: number = 0;
   let btYellowCount: number = 0;
@@ -147,7 +147,7 @@ const calcYellow = (stats: ResultInterface[]) => {
 };
 
 // Function to calculate corners
-const calcCorners = (stats: ResultInterface[]) => {
+const calcCorners = (stats: H2hInterface[]) => {
   let count: number = 0;
   let cornerCount: number = 0;
   stats.map((stat) => {

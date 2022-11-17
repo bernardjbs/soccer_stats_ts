@@ -1,4 +1,4 @@
-import { ResultInterface } from './interfaces';
+import { H2hInterface } from './interfaces';
 
 export type Match = {
   matchId: string,
@@ -7,10 +7,10 @@ export type Match = {
   homeTeam: string,
   awayTeam: string,
   hotStat: string,
-  overallHomeStats: ResultInterface[],
-  overallAwayStats: ResultInterface[],
-  overallH2hStats: ResultInterface[],
-  homeStats: ResultInterface[],
-  awayStats: ResultInterface[],
-  directH2hStats: ResultInterface[],
+  overallHomeStats: H2hInterface[],
+  overallAwayStats: H2hInterface[],
+  overallH2hStats: H2hInterface[],
+  homeStats: H2hInterface[],
+  awayStats: H2hInterface[],
+  directH2hStats: H2hInterface[],
 }
