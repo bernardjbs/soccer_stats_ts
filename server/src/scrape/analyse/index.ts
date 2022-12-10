@@ -1,2 +1,2 @@
-import {analyseMatches} from './analyseMatches.js'
+import { analyseMatches } from './analyseMatches.js'
 analyseMatches();

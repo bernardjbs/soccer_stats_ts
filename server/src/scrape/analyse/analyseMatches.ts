@@ -22,6 +22,7 @@ const MATCHES_COLLECTION = process.env.MATCHES_COLLECTION;
 // Fetch the matches to be analysed from database
 const getMatches = async () => {
   const database = client.db(DB_NAME);
+  // console.log(DB_NAME)
   const matchesCollection = database.collection(MATCHES_COLLECTION!);
   const matches = await matchesCollection
     .find({ matchStart: { $gt: new Date() } })
@@ -256,7 +257,7 @@ export const analyseMatches = async () => {
   try {
     const matches: Match[] = await getMatches();
     matches.map((match: Match) => {
-      console.log(`\n${match.homeTeam} VS ${match.awayTeam} | STARTING ${dateToStr(match.matchStart)}`.red);
+      console.log(`\n${match.competition} - ${match.homeTeam} VS ${match.awayTeam} | STARTING ${dateToStr(match.matchStart)}`.red);
       analyseBTTS(match);
       analyseOver(match);
       analyseUnder(match);

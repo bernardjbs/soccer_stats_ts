@@ -19,17 +19,16 @@ dotenv.config({
 Colors.enable();
 
 const match = async (matchId: string) => {
-
   const browser = await playwright.chromium.launch({
     headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
-  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary`); 
+  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary`);
 
-  const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':')
-  const homeTeam: string = await page.locator('.duelParticipant__home').innerText()
-  const awayTeam: string = await page.locator('.duelParticipant__away').innerText()
+  const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':');
+  const homeTeam: string = await page.locator('.duelParticipant__home').innerText();
+  const awayTeam: string = await page.locator('.duelParticipant__away').innerText();
   const competition: string = await page.locator('.tournamentHeader__country').innerText();
   console.log(`\n${competition} - ${homeTeam} vs ${awayTeam} *** match starts at: ${matchStart}`.red.bg_green);
 
@@ -38,8 +37,8 @@ const match = async (matchId: string) => {
   try {
     const previewBlocks = page.locator('.previewOpenBlock').locator('div');
     await page.locator('.previewShowMore').click({ timeout: 3000 });
-    hotStat = await previewBlocks.nth(5).innerText()
-    console.log(`Hot stat: ${hotStat}`)
+    hotStat = await previewBlocks.nth(5).innerText();
+    console.log(`Hot stat: ${hotStat}`);
   } catch (err) {
     hotStat = 'Hot Stats is not available for this match';
     console.log('Hot Stats is not available for this match');
@@ -48,9 +47,9 @@ const match = async (matchId: string) => {
   //******* OVERALL MATCHES ******/
   // Go to H2H Section - Default is on Overall Matches
   await page.locator('a[href="#/h2h"]').click();
-  const overallHomeElems = page.locator(".h2h").locator(".h2h__section").nth(0);
-  const overallAwayElems = page.locator(".h2h").locator(".h2h__section").nth(1);
-  const overallH2hElems = page.locator(".h2h").locator(".h2h__section").nth(2);
+  const overallHomeElems = page.locator('.h2h').locator('.h2h__section').nth(0);
+  const overallAwayElems = page.locator('.h2h').locator('.h2h__section').nth(1);
+  const overallH2hElems = page.locator('.h2h').locator('.h2h__section').nth(2);
 
   // Wait for locator to load before proceeding
   await overallHomeElems.waitFor();
@@ -69,7 +68,7 @@ const match = async (matchId: string) => {
   //******* HOME MATCHES ******/
   // Go to Home Matches
   await page.locator('a[href="#/h2h/home"]').click();
-  const homeElems = page.locator(".h2h").locator(".h2h__section").nth(0);
+  const homeElems = page.locator('.h2h').locator('.h2h__section').nth(0);
 
   // Wait for locator to load before proceeding
   await homeElems.waitFor();
@@ -80,7 +79,7 @@ const match = async (matchId: string) => {
   //******* AWAY MATCHES ******/
   // Go to Away Matches
   await page.locator('a[href="#/h2h/away"]').click();
-  const awayElems = page.locator(".h2h").locator(".h2h__section").nth(0);
+  const awayElems = page.locator('.h2h').locator('.h2h__section').nth(0);
 
   // Wait for locator to load before proceeding
   await awayElems.waitFor();
@@ -89,7 +88,7 @@ const match = async (matchId: string) => {
   const awayStats = await getStats(awayElems, page, 'Away team last matches');
 
   //******* DIRECT HEAD TO HEAD MATCHES ******/
-  const directH2hElems = page.locator(".h2h").locator(".h2h__section").nth(1);
+  const directH2hElems = page.locator('.h2h').locator('.h2h__section').nth(1);
   const directH2hStats = await getStats(directH2hElems, page, 'Direct Head to Head');
 
   // Build the match Object
@@ -105,32 +104,31 @@ const match = async (matchId: string) => {
     overallH2hStats: overallH2hStats,
     homeStats: homeStats,
     awayStats: awayStats,
-    directH2hStats: directH2hStats,
+    directH2hStats: directH2hStats
   };
   // console.log(util.inspect(match, { colors: true, depth: 4 }));
   console.log('Save to Database');
   saveMatch(match);
   await browser.close();
-}
+};
 
 const getStats = async (matches: playwright.Locator, page: playwright.Page, lastMatchesType: string) => {
   let statsCollection: H2hInterface[] = [];
-  const matchCollection = matches.locator(".rows").locator(".h2h__row");
+  const matchCollection = matches.locator('.rows').locator('.h2h__row');
   const count = await matchCollection.count();
   console.log(`Scraping ${lastMatchesType} (${count})...`);
   let outcome;
   for (let i = 0; i < count; i++) {
-    const homeTeam = await matchCollection.nth(i).locator(".h2h__homeParticipant").innerText();
-    const awayTeam = await matchCollection.nth(i).locator(".h2h__awayParticipant").innerText();
-    const competition = await matchCollection.nth(i).locator(".h2h__event").getAttribute("title");
+    const homeTeam = await matchCollection.nth(i).locator('.h2h__homeParticipant').innerText();
+    const awayTeam = await matchCollection.nth(i).locator('.h2h__awayParticipant').innerText();
+    const competition = await matchCollection.nth(i).locator('.h2h__event').getAttribute('title');
     const homeTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).innerText();
     const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();
 
-    if (await matchCollection.nth(i).locator('.wld').count() > 0) {
+    if ((await matchCollection.nth(i).locator('.wld').count()) > 0) {
       outcome = await matchCollection.nth(i).locator('.wld').innerText();
-    }
-    else {
-      outcome = "N/A"
+    } else {
+      outcome = 'N/A';
     }
 
     const [matchSummary] = await Promise.all([page.waitForEvent('popup'), await matchCollection.nth(i).click()]);
@@ -168,14 +166,13 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
       matchStats: matchStats
     };
 
-    statsCollection.push(tempH2Hobj)
+    statsCollection.push(tempH2Hobj);
     await matchSummary.close();
-
   }
   // console.log(util.inspect(statsCollection, { colors: true, depth: 4 }));
 
-  return statsCollection
-}
+  return statsCollection;
+};
 
 const setFavMatches = async (eventHeader: playwright.Locator) => {
   console.log('Selecting Competitions...'.green.bold);
@@ -203,7 +200,7 @@ const setFavMatches = async (eventHeader: playwright.Locator) => {
       }
     }
   }
-};;
+};
 
 export const getMatchIds = async (day: string) => {
   const browser = await playwright.chromium.launch({
