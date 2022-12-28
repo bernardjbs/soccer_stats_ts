@@ -1,9 +1,11 @@
 export const myLeagues = [
+  { country: 'AUSTRALIA', competition: 'A-League' },
   { country: 'BRAZIL', competition: 'Serie A' },
   { country: 'CHILE', competition: 'Primera Division' },
   { country: 'ENGLAND', competition: 'Premier League' },
   { country: 'ENGLAND', competition: 'Championship' },
   { country: 'ENGLAND', competition: 'League One' },
+  { country: 'ENGLAND', competition: 'EFL Cup' },
   { country: 'FRANCE', competition: 'Ligue 1' },
   { country: 'FRANCE', competition: 'Ligue 2' },
   { country: 'GERMANY', competition: 'Bundesliga' },

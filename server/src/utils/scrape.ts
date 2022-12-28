@@ -176,7 +176,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 
 const setFavMatches = async (eventHeader: playwright.Locator) => {
   console.log('Selecting Competitions...'.green.bold);
-  // await delay(60000);
+  // await delay(6000);
   const eventHeader_count = await eventHeader.count();
 
   for (let i = 0; i < eventHeader_count; i++) {
@@ -229,16 +229,25 @@ export const getMatchIds = async (day: string) => {
   // Loop through sportDivs and get ids from favourites
   let star_class;
   for (let i = 0; i < SNDivsCount; i++) {
-    const idElem = await sportNameDivs.nth(i).getAttribute('id');
+    let matchId = await sportNameDivs.nth(i).getAttribute('id');
+    const eventScore = sportNameDivs.nth(i).locator('div[class="event__score event__score--home"]');
+
     const starCount = await sportNameDivs.nth(i).locator('div').nth(0).locator('span').locator('svg').count();
+
     if (starCount > 0) {
       star_class = await sportNameDivs.nth(i).locator('div').nth(0).locator('span').locator('svg').getAttribute('class');
-      console.log(`Getting Match IDs for competition...`);
+      const country = await sportNameDivs.nth(i).locator('.event__title--type').innerText();
+      const league = await sportNameDivs.nth(i).locator('.event__title--name').innerText();
+      const competition = `${country} - ${league}`;
+      console.log(`\n Setting Match IDs for competition: ${competition}`.red.bold);
     }
 
-    if (star_class === 'star-ico eventStar eventStar--active' && idElem) {
-      console.log(`id ${idElem}`);
-      matchIds.push(idElem.substring(4));
+    if (star_class === 'star-ico eventStar eventStar--active' && matchId && ((await eventScore.count()) == 0 || (await eventScore.innerText()) === '-')) {
+      const homeTeam = await sportNameDivs.nth(i).locator('.event__participant--home').innerText();
+      const awayTeam = await sportNameDivs.nth(i).locator('.event__participant--away').innerText();
+      matchId = matchId.substring(4);
+      console.log(`${homeTeam} vs ${awayTeam} (ID: ${matchId})`);
+      matchIds.push(matchId);
     } else if (star_class === 'star-ico eventStar ') {
       break;
     }
