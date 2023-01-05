@@ -19,6 +19,7 @@ export const myLeagues = [
   { country: 'PORTUGAL', competition: 'Liga Portugal' },
   { country: 'SPAIN', competition: 'LaLiga' },
   { country: 'SPAIN', competition: 'LaLiga2' },
+  { country: 'TURKEY', competition: 'Super Lig' },
   { country: 'EUROPE', competition: 'Champions League - Group Stage' },
   { country: 'EUROPE', competition: 'Champions League - Qualification' },
   { country: 'EUROPE', competition: 'Champions League - Play Offs' },
