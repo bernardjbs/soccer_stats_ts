@@ -4,7 +4,7 @@ import util from 'util';
 import Colors from 'colors.ts';
 import { random, delay, strToDateTime } from '../utils/helpers.js';
 import { Match } from '../ts/types';
-import { saveMatch } from './scrapeController.js';
+import { saveMatch, matchExists } from './scrapeController.js';
 import { myLeagues } from './myLeagues.js';
 
 import { fileURLToPath } from 'url';
@@ -239,15 +239,23 @@ export const getMatchIds = async (day: string) => {
       const country = await sportNameDivs.nth(i).locator('.event__title--type').innerText();
       const league = await sportNameDivs.nth(i).locator('.event__title--name').innerText();
       const competition = `${country} - ${league}`;
-      console.log(`\n Setting Match IDs for competition: ${competition}`.red.bold);
+      console.log(`\nSetting Match IDs for competition: ${competition}`.green.bold);
     }
 
     if (star_class === 'star-ico eventStar eventStar--active' && matchId && ((await eventScore.count()) == 0 || (await eventScore.innerText()) === '-')) {
-      const homeTeam = await sportNameDivs.nth(i).locator('.event__participant--home').innerText();
-      const awayTeam = await sportNameDivs.nth(i).locator('.event__participant--away').innerText();
+      // Removing first 4 characters from the id string
       matchId = matchId.substring(4);
-      console.log(`${homeTeam} vs ${awayTeam} (ID: ${matchId})`);
-      matchIds.push(matchId);
+
+      // Check if matchId exists in database
+      if (await matchExists(matchId)) {
+        console.log(`Match ${matchId} exists in the database, skipping...`.bg_red)
+      }
+      else {
+        const homeTeam = await sportNameDivs.nth(i).locator('.event__participant--home').innerText();
+        const awayTeam = await sportNameDivs.nth(i).locator('.event__participant--away').innerText();
+        console.log(`${homeTeam} vs ${awayTeam} (ID: ${matchId})`);
+        matchIds.push(matchId);
+      }
     } else if (star_class === 'star-ico eventStar ') {
       break;
     }
