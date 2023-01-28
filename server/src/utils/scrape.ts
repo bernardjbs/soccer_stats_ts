@@ -122,8 +122,15 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
     const homeTeam = await matchCollection.nth(i).locator('.h2h__homeParticipant').innerText();
     const awayTeam = await matchCollection.nth(i).locator('.h2h__awayParticipant').innerText();
     const competition = await matchCollection.nth(i).locator('.h2h__event').getAttribute('title');
+
+    const homeTeamScoreCount = matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).count();
+    const awayTeamScoreCount = matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).count();
+    
+    if (await homeTeamScoreCount == 0 || await awayTeamScoreCount == 0) continue;
+
     const homeTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).innerText();
-    const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();
+    const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();    
+
 
     if ((await matchCollection.nth(i).locator('.wld').count()) > 0) {
       outcome = await matchCollection.nth(i).locator('.wld').innerText();
@@ -176,7 +183,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 
 const setFavMatches = async (eventHeader: playwright.Locator) => {
   console.log('Selecting Competitions...'.green.bold);
-  // await delay(6000);
+  await delay(2000);
   const eventHeader_count = await eventHeader.count();
 
   for (let i = 0; i < eventHeader_count; i++) {
@@ -211,7 +218,8 @@ export const getMatchIds = async (day: string) => {
   await page.goto('https://www.flashscore.com');
 
   if (day === 'nextDay') {
-    await page.locator('#live-table').locator('div').nth(0).locator('div[title="Next day"]').click();
+    const nextDay = page.locator('.calendarCont').locator('div').nth(0).locator('button[title="Next day"]');
+    await nextDay.click();
   }
 
   const sportNameDivs = page.locator('.sportName').locator('div');
@@ -248,9 +256,8 @@ export const getMatchIds = async (day: string) => {
 
       // Check if matchId exists in database
       if (await matchExists(matchId)) {
-        console.log(`Match ${matchId} exists in the database, skipping...`.bg_red)
-      }
-      else {
+        console.log(`Match ${matchId} exists in the database, skipping...`.bg_red);
+      } else {
         const homeTeam = await sportNameDivs.nth(i).locator('.event__participant--home').innerText();
         const awayTeam = await sportNameDivs.nth(i).locator('.event__participant--away').innerText();
         console.log(`${homeTeam} vs ${awayTeam} (ID: ${matchId})`);

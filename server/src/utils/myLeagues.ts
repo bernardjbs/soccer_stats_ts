@@ -5,6 +5,8 @@ export const myLeagues = [
   { country: 'ENGLAND', competition: 'Premier League' },
   { country: 'ENGLAND', competition: 'Championship' },
   { country: 'ENGLAND', competition: 'League One' },
+  { country: 'ENGLAND', competition: 'League Two' },
+  { country: 'ENGLAND', competition: 'FA Cup' },
   { country: 'ENGLAND', competition: 'EFL Cup' },
   { country: 'FRANCE', competition: 'Ligue 1' },
   { country: 'FRANCE', competition: 'Ligue 2' },
