@@ -31,7 +31,11 @@ const matchSchema = new Schema<Match>({
   overallH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
   homeStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
   awayStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  directH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }]
+  directH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }], 
+  formStats: {
+    homeForm: { type: Object }, 
+    awayForm: {type: Object}
+  }
 });
 
 const Match = model('match', matchSchema);

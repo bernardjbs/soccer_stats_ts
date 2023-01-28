@@ -35,7 +35,6 @@ const getMatches = async () => {
   return matches;
 };
 
-
 const getTotalAvgGoals = (match: Match) => {
   const calcAvgGoals = (stats: H2hInterface[]): number => {
     const statCount = stats.length;
@@ -55,7 +54,7 @@ const getTotalAvgGoals = (match: Match) => {
   let allStatsCount: number = 6;
   if (match.directH2hStats.length < 1) {
     allStatsCount = 5;
-  };
+  }
 
   const totalAvgGoals = (homeAvgGoals + awayAvgGoals + overallHomeAvgGoals + overallAwayAvgGoals + overallH2hAvgGoals + directH2hAvgGoals) / allStatsCount;
   return totalAvgGoals;
@@ -66,15 +65,15 @@ const calcH2hWinner = (stats: H2hInterface[], matchHomeTeam: string, matchAwayTe
   let homeWinCount = 0;
   let awayWinCount = 0;
   stats.map((stat) => {
-    if (matchHomeTeam == stat.homeTeam && (stat.homeTeamScore > stat.awayTeamScore)) {
+    if (matchHomeTeam == stat.homeTeam && stat.homeTeamScore > stat.awayTeamScore) {
       homeWinCount = homeWinCount + 1;
-    } else if (matchHomeTeam == stat.awayTeam && (stat.homeTeamScore < stat.awayTeamScore)) {
+    } else if (matchHomeTeam == stat.awayTeam && stat.homeTeamScore < stat.awayTeamScore) {
       homeWinCount = homeWinCount + 1;
-    } else if (matchAwayTeam == stat.homeTeam && (stat.homeTeamScore > stat.awayTeamScore)) {
+    } else if (matchAwayTeam == stat.homeTeam && stat.homeTeamScore > stat.awayTeamScore) {
       awayWinCount = awayWinCount + 1;
-    }else if (matchAwayTeam == stat.awayTeam && (stat.homeTeamScore < stat.awayTeamScore)) {
+    } else if (matchAwayTeam == stat.awayTeam && stat.homeTeamScore < stat.awayTeamScore) {
       awayWinCount = awayWinCount + 1;
-    };
+    }
   });
   if (homeWinCount > 3) {
     return {
@@ -90,7 +89,7 @@ const calcH2hWinner = (stats: H2hInterface[], matchHomeTeam: string, matchAwayTe
     return {
       score: 0
     };
-  };
+  }
 };
 
 // Function to calculate analysis types
@@ -100,24 +99,24 @@ const calcAnalysis = (type: string, stats: H2hInterface[]) => {
     if (type == 'calcBTTS') {
       if (stat.homeTeamScore > 0 && stat.awayTeamScore > 0) {
         count = count + 1;
-      };
+      }
     } else if (type == 'calcOver') {
       if (stat.homeTeamScore + stat.awayTeamScore > 2) {
         count = count + 1;
-      };
+      }
     } else if (type == 'calcUnder') {
       if (stat.homeTeamScore + stat.awayTeamScore < 3) {
         count = count + 1;
-      };
+      }
     } else {
       console.log('Could not perform analysis'.red);
-    };
+    }
   });
   if (count > 3) {
     return 1;
   } else {
     return 0;
-  };
+  }
 };
 
 // Function to calculate yellow cards
@@ -134,8 +133,8 @@ const calcYellow = (stats: H2hInterface[]) => {
           cardCount = cardCount + (matchStat.homeStat + matchStat.awayStat);
           if (matchStat.homeStat > 0 && matchStat.awayStat > 0) {
             btYellowCount = btYellowCount + 1;
-          };
-        };
+          }
+        }
       });
     }
   });
@@ -158,7 +157,7 @@ const calcCorners = (stats: H2hInterface[]) => {
         if (matchStat.categoryStat === 'Corner Kicks') {
           count = count + 1;
           cornerCount = cornerCount + (matchStat.homeStat + matchStat.awayStat);
-        };
+        }
       });
     }
   });
@@ -252,6 +251,28 @@ const analyseCorner = (match: Match) => {
   if (avgCorner > 0) console.log(`Average corners: ${avgCorner.toFixed(2)}`.cyan.bold);
 };
 
+// Function to analyse home and away form
+const analyseForm = (match: Match) => {
+  if (match.formStats) {
+    const homeForm = match.formStats.homeForm;
+    const awayForm = match.formStats.awayForm;
+
+    let homeTeamScore: number = 0;
+    let awayTeamScore: number = 0;
+
+    homeForm.homeTeamRank < homeForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
+    awayForm.homeTeamRank < awayForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
+    
+    if (homeTeamScore == 2) {
+
+      console.log(`${match.homeTeam} IS IN FORM`.yellow.bg_blue.bold);
+    } else if(awayTeamScore == 2){ 
+
+      console.log(`${match.awayTeam} IS IN FORM`.yellow.bg_blue.bold);
+    }
+  }
+};
+
 // MAIN FUNCTION - Analyse the matches
 export const analyseMatches = async () => {
   try {
@@ -264,10 +285,11 @@ export const analyseMatches = async () => {
       analyseWinner(match);
       analyseYellow(match);
       analyseCorner(match);
+      analyseForm(match);
     });
   } catch (error) {
     console.log(error);
   } finally {
     await client.close();
-  };
+  }
 };

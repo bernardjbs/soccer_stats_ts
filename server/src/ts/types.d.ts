@@ -1,4 +1,4 @@
-import { H2hInterface } from './interfaces';
+import { H2hInterface, TeamFormRankInterface } from './interfaces';
 
 export type Match = {
   matchId: string,
@@ -13,4 +13,8 @@ export type Match = {
   homeStats: H2hInterface[],
   awayStats: H2hInterface[],
   directH2hStats: H2hInterface[],
+  formStats: {
+    homeForm: TeamFormRankInterface, 
+    awayForm: TeamFormRankInterface
+  }
 };

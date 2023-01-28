@@ -1,3 +1,4 @@
+import { TeamFormRankInterface } from './../ts/interfaces.d';
 import playwright from 'playwright';
 import { MatchStatsInterface, H2hInterface } from '../ts/interfaces';
 import util from 'util';
@@ -10,6 +11,7 @@ import { myLeagues } from './myLeagues.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
+import { table } from 'console';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({
@@ -44,6 +46,69 @@ const match = async (matchId: string) => {
     console.log('Hot Stats is not available for this match');
   }
 
+  //******* FORM STATS ******/
+  const standingsCount = await page.locator('a[href="#/standings"]').count();
+  let homeForm: TeamFormRankInterface = {
+    homeTeamRank: 0,
+    awayTeamRank: 0
+  };
+
+  let awayForm: TeamFormRankInterface = {
+    homeTeamRank: 0,
+    awayTeamRank: 0
+  };
+
+  let formStats: any = {
+    homeForm: {},
+    awayForm: {}
+  };
+
+  if (standingsCount > 0) {
+    await page.locator('a[href="#/standings"]').click();
+    await page.locator('a[href="#/standings/form"]').click();
+    await page.locator('a[href="#/standings/form/home"]').click();
+
+    const standingHomeFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
+    const homeFormTeam1 = await standingHomeFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
+    const homeFormTeam1Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
+    const homeFormTeam2Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
+
+    if (homeTeam === homeFormTeam1) {
+      homeForm = {
+        homeTeamRank: parseInt(homeFormTeam1Rank),
+        awayTeamRank: parseInt(homeFormTeam2Rank)
+      };
+    } else {
+      homeForm = {
+        homeTeamRank: parseInt(homeFormTeam2Rank),
+        awayTeamRank: parseInt(homeFormTeam1Rank)
+      };
+    }
+
+    await page.locator('a[href="#/standings/form/away"]').click();
+    const standingAwayFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
+    const awayFormTeam1 = await standingAwayFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
+    const awayFormTeam1Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
+    const awayFormTeam2Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
+
+    if (homeTeam === awayFormTeam1) {
+      awayForm = {
+        homeTeamRank: parseInt(awayFormTeam1Rank),
+        awayTeamRank: parseInt(awayFormTeam2Rank)
+      };
+    } else {
+      awayForm = {
+        homeTeamRank: parseInt(awayFormTeam2Rank),
+        awayTeamRank: parseInt(awayFormTeam1Rank)
+      };
+    }
+  }
+
+  formStats = {
+    homeForm,
+    awayForm
+  };
+  
   //******* OVERALL MATCHES ******/
   // Go to H2H Section - Default is on Overall Matches
   await page.locator('a[href="#/h2h"]').click();
@@ -104,7 +169,8 @@ const match = async (matchId: string) => {
     overallH2hStats: overallH2hStats,
     homeStats: homeStats,
     awayStats: awayStats,
-    directH2hStats: directH2hStats
+    directH2hStats: directH2hStats,
+    formStats: formStats
   };
   // console.log(util.inspect(match, { colors: true, depth: 4 }));
   console.log('Save to Database');
@@ -125,12 +191,11 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 
     const homeTeamScoreCount = matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).count();
     const awayTeamScoreCount = matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).count();
-    
-    if (await homeTeamScoreCount == 0 || await awayTeamScoreCount == 0) continue;
+
+    if ((await homeTeamScoreCount) == 0 || (await awayTeamScoreCount) == 0) continue;
 
     const homeTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).innerText();
-    const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();    
-
+    const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();
 
     if ((await matchCollection.nth(i).locator('.wld').count()) > 0) {
       outcome = await matchCollection.nth(i).locator('.wld').innerText();
