@@ -22,7 +22,6 @@ const MATCHES_COLLECTION = process.env.MATCHES_COLLECTION;
 // Fetch the matches to be analysed from database
 const getMatches = async () => {
   const database = client.db(DB_NAME);
-  // console.log(DB_NAME)
   const matchesCollection = database.collection(MATCHES_COLLECTION!);
   const matches = await matchesCollection
     .find({ matchStart: { $gt: new Date() } })
@@ -174,12 +173,12 @@ const analyseBTTS = (match: Match) => {
   const overallH2hBTTS = calcAnalysis('calcBTTS', match.overallH2hStats);
   const directH2hBTTS = calcAnalysis('calcBTTS', match.directH2hStats);
   const totalBTTS_score = homeBTTS + awayBTTS + overallHomeBTTS + overallAwayBTTS + overallH2hBTTS + directH2hBTTS;
-  if (homeBTTS > 0) console.log(`Home Team BTTS is at least 4/5`.magenta);
-  if (awayBTTS > 0) console.log(`Away Team BTTS is at least 4/5`.magenta);
-  if (overallHomeBTTS > 0) console.log(`Overall Home BTTS is at least 4/5`.magenta);
-  if (overallAwayBTTS > 0) console.log(`Overall Away BTTS is at least 4/5`.magenta);
-  if (overallH2hBTTS > 0) console.log(`Overall Head To Head BTTS is at least 4/5`.magenta);
-  if (directH2hBTTS > 0) console.log(`Direct H2H BTTS is at least 4/5`.cyan);
+  // if (homeBTTS > 0) console.log(`Home Team BTTS is at least 4/5`.magenta);
+  // if (awayBTTS > 0) console.log(`Away Team BTTS is at least 4/5`.magenta);
+  // if (overallHomeBTTS > 0) console.log(`Overall Home BTTS is at least 4/5`.magenta);
+  // if (overallAwayBTTS > 0) console.log(`Overall Away BTTS is at least 4/5`.magenta);
+  // if (overallH2hBTTS > 0) console.log(`Overall Head To Head BTTS is at least 4/5`.magenta);
+  // if (directH2hBTTS > 0) console.log(`Direct H2H BTTS is at least 4/5`.cyan);
   if (totalBTTS_score > 3) console.log(`TOTAL BTTS score is at least 4/6`.bg_magenta);
 };
 
@@ -262,12 +261,10 @@ const analyseForm = (match: Match) => {
 
     homeForm.homeTeamRank < homeForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
     awayForm.homeTeamRank < awayForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
-    
+
     if (homeTeamScore == 2) {
-
       console.log(`${match.homeTeam} IS IN FORM`.yellow.bg_blue.bold);
-    } else if(awayTeamScore == 2){ 
-
+    } else if (awayTeamScore == 2) {
       console.log(`${match.awayTeam} IS IN FORM`.yellow.bg_blue.bold);
     }
   }
@@ -285,7 +282,7 @@ export const analyseMatches = async () => {
       analyseWinner(match);
       analyseYellow(match);
       analyseCorner(match);
-      analyseForm(match);
+      // analyseForm(match);
     });
   } catch (error) {
     console.log(error);

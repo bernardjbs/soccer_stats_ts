@@ -5,4 +5,13 @@ const matchIds = await getMatchIds('nextDay');
 
 await buildStats(matchIds);
 
-// await buildStats(['tONeukvD']);
+// await buildStats([
+//   '8dr39Uqo',
+//   'fRiVT1Fk',
+//   'Oz9kBMGg',
+//   'b7rwpwM7',
+//   'Gb3HYcW9',
+//   'AiNQTJjN',
+//   'pERW1nvE',
+//   'xWlS4nIq',
+// ]);

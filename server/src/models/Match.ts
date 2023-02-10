@@ -1,6 +1,13 @@
+import { ResultInterface, MatchStatsInterface } from './../ts/interfaces.d';
 import { Schema, model } from 'mongoose';
 import { Match } from '../ts/types';
 import { H2hInterface } from '../ts/interfaces';
+
+const matchStatsSchema = new Schema<MatchStatsInterface>({
+  categoryStat: String,
+  homeStat: String,
+  awayStat: String
+});
 
 const h2hSchema = new Schema<H2hInterface>({
   date: { type: Date },
@@ -10,13 +17,13 @@ const h2hSchema = new Schema<H2hInterface>({
   homeTeamScore: { type: Number },
   awayTeamScore: { type: Number },
   outcome: { type: String },
-  matchStats: [
-    {
-      categoryStat: { type: String, required: true },
-      homeStat: { type: Number, required: true },
-      awayStat: { type: Number, required: true }
-    }
-  ]
+  matchStats: [{ type: Schema.Types.ObjectId, ref: matchStatsSchema }]
+});
+
+const resultSchema = new Schema<ResultInterface>({
+  homeScore: Number,
+  awayScore: Number,
+  matchStats: [{ type: Schema.Types.ObjectId, ref: matchStatsSchema }]
 });
 
 const matchSchema = new Schema<Match>({
@@ -31,10 +38,15 @@ const matchSchema = new Schema<Match>({
   overallH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
   homeStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
   awayStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  directH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }], 
+  directH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
   formStats: {
-    homeForm: { type: Object }, 
-    awayForm: {type: Object}
+    homeForm: { type: Object },
+    awayForm: { type: Object }
+  },
+  result: {
+    homeScore: String,
+    awayScore: String,
+    matchStats: [{ type: Schema.Types.ObjectId, ref: resultSchema }]
   }
 });
 

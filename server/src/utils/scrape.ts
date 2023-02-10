@@ -22,7 +22,7 @@ Colors.enable();
 
 const match = async (matchId: string) => {
   const browser = await playwright.chromium.launch({
-    headless: false // setting this to true will not run the UI
+    // headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
@@ -108,7 +108,7 @@ const match = async (matchId: string) => {
     homeForm,
     awayForm
   };
-  
+
   //******* OVERALL MATCHES ******/
   // Go to H2H Section - Default is on Overall Matches
   await page.locator('a[href="#/h2h"]').click();
@@ -170,7 +170,8 @@ const match = async (matchId: string) => {
     homeStats: homeStats,
     awayStats: awayStats,
     directH2hStats: directH2hStats,
-    formStats: formStats
+    formStats: formStats,
+    result: []
   };
   // console.log(util.inspect(match, { colors: true, depth: 4 }));
   console.log('Save to Database');
@@ -276,7 +277,7 @@ const setFavMatches = async (eventHeader: playwright.Locator) => {
 
 export const getMatchIds = async (day: string) => {
   const browser = await playwright.chromium.launch({
-    headless: false // setting this to true will not run the UI
+    // headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
