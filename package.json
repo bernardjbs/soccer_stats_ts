@@ -7,6 +7,7 @@
     "develop": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
     "scrape": "cd server && npm run scrape", 
     "analyse": "cd server && npm run analyse", 
+    "delete": "cd server && npm run delete", 
     "dev": "cd server && npm run dev" 
   },
   "repository": {

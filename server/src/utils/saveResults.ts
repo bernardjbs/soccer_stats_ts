@@ -16,9 +16,11 @@ dotenv.config({
 // Get matches with no results
 const matches = await emptyResultMatches();
 
+console.log(`Matches with empty results: ${matches.length}`)
 const updateResult = async (matchId: String) => {
   console.log(`Saving result for match: ${matchId}`);
-  const browser = await chromium.launch({ headless: true });
+
+  const browser = await chromium.launch({ headless: true }); //Headless false = With browser
   const context = await browser.newContext();
   const page = await context.newPage();
   // await page.goto('https://www.flashscore.com/');
@@ -31,7 +33,10 @@ const updateResult = async (matchId: String) => {
   });
 
   if (matchStatus === 'Finished') {
-    await page.locator('a[href="#/match-summary/match-statistics"]').click();
+    const statsBtnLocator = page.locator('a[href="#/match-summary/match-statistics"]');
+    if ((await statsBtnLocator.count()) == 0) return 0;
+
+    await statsBtnLocator.click();
     await delay(2000);
 
     const scores = page.locator('.detailScore__wrapper');
@@ -61,11 +66,10 @@ const updateResult = async (matchId: String) => {
     }
 
     const resultObj = {
-      homeScore: homeScore, 
-      awayScore: awayScore, 
+      homeScore: homeScore,
+      awayScore: awayScore,
       matchStats: matchStats
-    }
-
+    };
     await updateMatchResult(matchId, resultObj);
   }
   page.close();
@@ -78,7 +82,7 @@ matches.map((match: Match) => {
 });
 
 // The count for number of matche results to be updated at one run
-let count = 1;
+let count = 50;
 
 // Update a single matchId
 // updateResult('4lyB61B6');
@@ -94,7 +98,7 @@ const updateResults = async (matchIds: string[], interval: number = 1000) => {
   await updateResult(matchIds[0]);
 
   setTimeout(
-    () => updateResults(matchIds.slice(1), interval), // wrap in an arrow function to defer evaluation
+    () => {updateResults(matchIds.slice(1), interval)}, // wrap in an arrow function to defer evaluation
     interval
   );
 };

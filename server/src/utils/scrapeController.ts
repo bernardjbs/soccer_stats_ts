@@ -17,6 +17,23 @@ const MATCHES_COLLECTION = process.env.MATCHES_COLLECTION;
 const database = client.db(DB_NAME);
 const matchCollection = database.collection(MATCHES_COLLECTION!);
 
+export const deleteMatches = async (matchIds: string[]) => {
+  let count = 0;
+  matchIds.map(async (matchId, i) => {
+    try {
+      await matchCollection.deleteOne({ matchId: matchId });
+      console.log(`A document was deleted with the matchId: ${matchId}`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      count = count + 1;
+      if (count === matchIds.length) {
+        process.exit();
+      }
+    }
+  });
+};
+
 export const saveMatch = async (match: Match) => {
   try {
     // const result = await matchCollection.updateOne({ matchId: match.matchId }, { $setOnInsert: match }, { upsert: true });
@@ -33,7 +50,6 @@ export const saveMatch = async (match: Match) => {
 export const matchExists = async (matchId: String) => {
   try {
     const foundMatch = await matchCollection.findOne({ matchId: matchId });
-
     if (foundMatch) return true;
     return false;
   } catch (error) {
@@ -43,17 +59,22 @@ export const matchExists = async (matchId: String) => {
 
 export const updateMatchResult = async (matchId: String, results: Object) => {
   try {
-    const result = await matchCollection.updateOne({ matchId: matchId }, { $set: { result: results } });
+    await matchCollection.updateOne({ matchId: matchId }, { $set: { result: results } });
     console.log(`Result Updated`);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   } 
 };
 
 export const emptyResultMatches = async () => {
   try {
+    const filterDateTime = new Date();
+    filterDateTime.setHours(filterDateTime.getHours() - 2);
     const matches = await matchCollection
-      .find({ result: [] })
+      .find({
+        result: [],
+        matchStart: { $lt: filterDateTime }
+      })
       .toArray()
       .then((res) => {
         const json = JSON.parse(JSON.stringify(res));

@@ -9,7 +9,8 @@
     "start": "node build/server.js",
     "dev": "tsc-watch --onSuccess \"node ./build/server.js\"",
     "scrape": "cd build/scrape && node match.js", 
-    "analyse": "cd build/scrape/analyse && node index.js"
+    "analyse": "cd build/scrape/analyse && node index.js",
+    "delete": "cd build/utils && node deleteMatches.js"
   },
   "keywords": [],
   "author": "",

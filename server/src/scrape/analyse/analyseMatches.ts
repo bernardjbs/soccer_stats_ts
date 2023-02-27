@@ -251,24 +251,24 @@ const analyseCorner = (match: Match) => {
 };
 
 // Function to analyse home and away form
-const analyseForm = (match: Match) => {
-  if (match.formStats) {
-    const homeForm = match.formStats.homeForm;
-    const awayForm = match.formStats.awayForm;
+// const analyseForm = (match: Match) => {
+//   if (match.formStats) {
+//     const homeForm = match.formStats.homeForm;
+//     const awayForm = match.formStats.awayForm;
 
-    let homeTeamScore: number = 0;
-    let awayTeamScore: number = 0;
+//     let homeTeamScore: number = 0;
+//     let awayTeamScore: number = 0;
 
-    homeForm.homeTeamRank < homeForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
-    awayForm.homeTeamRank < awayForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
+//     homeForm.homeTeamRank < homeForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
+//     awayForm.homeTeamRank < awayForm.awayTeamRank ? homeTeamScore++ : awayTeamScore++;
 
-    if (homeTeamScore == 2) {
-      console.log(`${match.homeTeam} IS IN FORM`.yellow.bg_blue.bold);
-    } else if (awayTeamScore == 2) {
-      console.log(`${match.awayTeam} IS IN FORM`.yellow.bg_blue.bold);
-    }
-  }
-};
+//     if (homeTeamScore == 2) {
+//       console.log(`${match.homeTeam} IS IN FORM`.yellow.bg_blue.bold);
+//     } else if (awayTeamScore == 2) {
+//       console.log(`${match.awayTeam} IS IN FORM`.yellow.bg_blue.bold);
+//     }
+//   }
+// };
 
 // MAIN FUNCTION - Analyse the matches
 export const analyseMatches = async () => {

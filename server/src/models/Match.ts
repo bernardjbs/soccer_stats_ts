@@ -1,4 +1,4 @@
-import { ResultInterface, MatchStatsInterface } from './../ts/interfaces.d';
+import { ResultInterface, MatchStatsInterface, TeamFormRankInterface } from './../ts/interfaces.d';
 import { Schema, model } from 'mongoose';
 import { Match } from '../ts/types';
 import { H2hInterface } from '../ts/interfaces';

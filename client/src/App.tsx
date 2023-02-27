@@ -1,5 +1,6 @@
 import React from "react";
-
+import { MatchTable } from "./components/MatchTable";
+import { Scroll } from "./components/Scroll";
 import {
   ApolloClient,
   InMemoryCache,
@@ -7,6 +8,7 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { MatchId } from "./components/MatchId";
 
 let httpLink;
 if (process.env.NODE_ENV === "development") {
@@ -38,31 +40,9 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <section className="m-2">
-        <div
-          className="
-        border-solid border-2 border-black"
-        >
-          <h1 className="text-red-500 text-xl font-bold">
-            England Championship - Round 26 - Blackburn VS Cardif - Sunday 1
-            January 2023, 20:00
-          </h1>
-        </div>
-        <section className="flex">
-          <div className="bg-gray-200">
-            <p>Blackburn BTTS @Home at least 4/5 times</p>
-            <p>Cardif BTTS @Away at least 4/5 times</p>
-            <p>Blackburn BTTS @Overall at least 4/5 times</p>
-            <p>Cardif BTTS @Overall at least 4/5 times</p>
-            <p>Direct BTTS is at least 4/5 times</p>
-          </div>
-          <div className="bg-gray-300">
-            <p>Won (3-2)</p>
-            <p>Won (3-2)</p>
-            <p>Won (3-2)</p>
-            <p>Won (3-2)</p>
-            <p>Won (3-2)</p>
-          </div>
-        </section>
+        <MatchTable />
+        <MatchId />
+        {/* <Scroll /> */}
       </section>
     </ApolloProvider>
   );
