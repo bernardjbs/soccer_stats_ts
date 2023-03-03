@@ -1,22 +1,14 @@
 import mongoose, { ConnectOptions } from 'mongoose';
-import { fileURLToPath } from 'url';
+import { processEnv } from '../utils/processEnv.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({
-  path: path.resolve(__dirname, '../../.env')
-});
+const  MONGODB_URI= processEnv().MONGODB_URI 
 
 mongoose
-  .connect('mongodb+srv://bernardjbs:mongo6150@mocart.ni5gw.mongodb.net/pictura?retryWrites=true&w=majority', {
+  .set('strictQuery', true)
+  .connect(MONGODB_URI!, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   } as ConnectOptions)
   .then(() => console.log('connected to MongoDB'));
 const db = mongoose.connection;
 export default db;
-

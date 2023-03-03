@@ -1,5 +1,5 @@
 import { emptyResultMatches, updateMatchResult } from './scrapeController.js';
-import { Match } from '../ts/types';
+import { MatchType } from '../ts/types';
 import playwright, { chromium } from 'playwright';
 import { delay } from './helpers.js';
 
@@ -77,7 +77,7 @@ const updateResult = async (matchId: String) => {
 
 let matchIds: string[] = []
 
-matches.map((match: Match) => {
+matches.map((match: MatchType) => {
   matchIds.push(match.matchId)
 });
 

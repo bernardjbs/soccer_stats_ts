@@ -1,6 +1,5 @@
-import { match } from 'assert';
 import { MongoClient } from 'mongodb';
-import { Match } from '../ts/types';
+import { MatchType } from '../ts/types';
 
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -34,12 +33,26 @@ export const deleteMatches = async (matchIds: string[]) => {
   });
 };
 
-export const saveMatch = async (match: Match) => {
+
+import Match  from '../models/Match.js';
+export const saveMatch = async (match: MatchType) => {
+  // try {
+  //   const newMatch = new Match(match);
+
+  //     const result = await matchCollection.insertOne(newMatch);
+  //     console.log(`A document was inserted with the _id: ${result.insertedId}`);
+  // } catch (error) {
+  //   console.log(error);
+  // }
+
+
   try {
     // const result = await matchCollection.updateOne({ matchId: match.matchId }, { $setOnInsert: match }, { upsert: true });
     // console.log(`A document was inserted with the _id: ${result.upsertedId}`);
 
     // create a document to insert
+      //   const newMatch = new Match(match);
+
     const result = await matchCollection.insertOne(match);
     console.log(`A document was inserted with the _id: ${result.insertedId}`);
   } finally {

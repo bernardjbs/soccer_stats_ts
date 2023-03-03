@@ -1,5 +1,5 @@
 import { H2hInterface } from '../../ts/interfaces';
-import { Match } from '../../ts/types';
+import { MatchType } from '../../ts/types';
 import { MongoClient } from 'mongodb';
 
 import { dateToStr } from '../../utils/helpers.js';
@@ -34,7 +34,7 @@ const getMatches = async () => {
   return matches;
 };
 
-const getTotalAvgGoals = (match: Match) => {
+const getTotalAvgGoals = (match: MatchType) => {
   const calcAvgGoals = (stats: H2hInterface[]): number => {
     const statCount = stats.length;
     let totalGoals = 0;
@@ -165,7 +165,7 @@ const calcCorners = (stats: H2hInterface[]) => {
 };
 
 // Function to analyse Both team to score
-const analyseBTTS = (match: Match) => {
+const analyseBTTS = (match: MatchType) => {
   const homeBTTS = calcAnalysis('calcBTTS', match.homeStats);
   const awayBTTS = calcAnalysis('calcBTTS', match.awayStats);
   const overallHomeBTTS = calcAnalysis('calcBTTS', match.overallHomeStats);
@@ -183,7 +183,7 @@ const analyseBTTS = (match: Match) => {
 };
 
 // Function to analyse Over 2.5 Goals
-const analyseOver = (match: Match) => {
+const analyseOver = (match: MatchType) => {
   const homeOver = calcAnalysis('calcOver', match.homeStats);
   const awayOver = calcAnalysis('calcOver', match.awayStats);
   const overallHomeOver = calcAnalysis('calcOver', match.overallHomeStats);
@@ -196,7 +196,7 @@ const analyseOver = (match: Match) => {
 };
 
 // Function to analyse Under 2.5 Goals
-const analyseUnder = (match: Match) => {
+const analyseUnder = (match: MatchType) => {
   const homeOver = calcAnalysis('calcUnder', match.homeStats);
   const awayOver = calcAnalysis('calcUnder', match.awayStats);
   const overallHomeOver = calcAnalysis('calcUnder', match.overallHomeStats);
@@ -209,7 +209,7 @@ const analyseUnder = (match: Match) => {
 };
 
 // Function to analyse head to head winners
-const analyseWinner = (match: Match) => {
+const analyseWinner = (match: MatchType) => {
   // Winners
   const overallH2hWinner = calcH2hWinner(match.overallH2hStats, match.homeTeam, match.awayTeam);
   if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'home') console.log(`OVERALL - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.blue);
@@ -221,7 +221,7 @@ const analyseWinner = (match: Match) => {
 };
 
 // Function to calculate yellow cards
-const analyseYellow = (match: Match) => {
+const analyseYellow = (match: MatchType) => {
   const homeYellow = calcYellow(match.homeStats);
   const awayYellow = calcYellow(match.awayStats);
   const overallHomeYellow = calcYellow(match.overallHomeStats);
@@ -237,7 +237,7 @@ const analyseYellow = (match: Match) => {
 };
 
 // Function to calculate corners
-const analyseCorner = (match: Match) => {
+const analyseCorner = (match: MatchType) => {
   const homeCorners = calcCorners(match.homeStats).avgCorner;
   const awayCorners = calcCorners(match.awayStats).avgCorner;
   const overallHomeCorners = calcCorners(match.overallHomeStats).avgCorner;
@@ -273,8 +273,8 @@ const analyseCorner = (match: Match) => {
 // MAIN FUNCTION - Analyse the matches
 export const analyseMatches = async () => {
   try {
-    const matches: Match[] = await getMatches();
-    matches.map((match: Match) => {
+    const matches: MatchType[] = await getMatches();
+    matches.map((match: MatchType) => {
       console.log(`\n${match.competition} - ${match.homeTeam} VS ${match.awayTeam} | STARTING ${dateToStr(match.matchStart)}`.red);
       analyseBTTS(match);
       analyseOver(match);

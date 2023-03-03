@@ -4,7 +4,7 @@ import { MatchStatsInterface, H2hInterface } from '../ts/interfaces';
 import util from 'util';
 import Colors from 'colors.ts';
 import { random, delay, strToDateTime } from '../utils/helpers.js';
-import { Match } from '../ts/types';
+import { MatchType } from '../ts/types';
 import { saveMatch, matchExists } from './scrapeController.js';
 import { myLeagues } from './myLeagues.js';
 
@@ -157,7 +157,7 @@ const match = async (matchId: string) => {
   const directH2hStats = await getStats(directH2hElems, page, 'Direct Head to Head');
 
   // Build the match Object
-  let match: Match = {
+  let match: MatchType = {
     matchId: matchId,
     matchStart: matchStart,
     competition: competition,

@@ -1,6 +1,6 @@
 import { H2hInterface, TeamFormRankInterface, ResultInterface } from './interfaces';
 
-export type Match = {
+export type MatchType = {
   matchId: string,
   matchStart: Date,
   competition: string,

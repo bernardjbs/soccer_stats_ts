@@ -1,47 +1,61 @@
-import { ApolloServer } from 'apollo-server-express';
+// startApolloServer();
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import express from 'express';
+import http from 'http';
+import cors from 'cors';
 import resolvers from './schemas/resolvers.js';
 import typeDefs from './schemas/typeDefs.js';
-import { fileURLToPath } from 'url';
-import path from 'path';
-import dotenv from 'dotenv';
-import authMiddleware from './utils/auth.js';
-// import signToken  from './utils/auth.js';
-
 import db from './config/connection.js';
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
+import bodyParser from 'body-parser';
+
 const __dirname = path.dirname(__filename);
 
-dotenv.config({
-  path: path.resolve(__dirname, '../../.env')
-});
+import { processEnv } from './utils/processEnv.js';
 
-const PORT = process.env.PORT || 4000;
+const PORT = processEnv().PORT || 4000;
+
+interface MyContext {
+  token?: String;
+}
 
 const app = express();
-
-app.use(express.json());
-
-const server = new ApolloServer({
+const httpServer = http.createServer(app);
+const server = new ApolloServer<MyContext>({
   typeDefs,
   resolvers,
-  context: authMiddleware
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
 });
 
-app.use(express.urlencoded({ extended: true }));
+await server.start();
 
-// Create a new instance of an Apollo server with the GraphQL schema
-const startApolloServer = async () => {
-  await server.start();
-  server.applyMiddleware({ app });
+app.use(
+  '/graphql',
+  cors<cors.CorsRequest>({
+    origin: ['http://localhost:3000', 'http://localhost:8000']
+  }),
+  bodyParser.json(),
+  // express.json(),
+  expressMiddleware(server, {
+    context: async ({ req }) => ({ token: req.headers.token })
+  })
+);
 
-  db.once('open', () => {
-    app.listen(PORT, () => {
-      console.log(`API server running on port ${PORT}!`);
-      console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
-    });
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../../client/build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../client/build/index.html'));
   });
-};
+}
 
-startApolloServer();
+db.once('open', () => {
+  app.listen(PORT, () => {
+    console.log(`API server running on port ${PORT}!`);
+    console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+  });
+});

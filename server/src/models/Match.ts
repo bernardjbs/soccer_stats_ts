@@ -1,54 +1,82 @@
-import { ResultInterface, MatchStatsInterface, TeamFormRankInterface } from './../ts/interfaces.d';
 import { Schema, model } from 'mongoose';
-import { Match } from '../ts/types';
-import { H2hInterface } from '../ts/interfaces';
+// import { MatchType } from '../ts/types';
 
-const matchStatsSchema = new Schema<MatchStatsInterface>({
-  categoryStat: String,
-  homeStat: String,
-  awayStat: String
-});
+interface MatchStatsInterface {
+  categoryStat: string;
+  homeStat: number;
+  awayStat: number;
+}
 
-const h2hSchema = new Schema<H2hInterface>({
-  date: { type: Date },
-  competition: { type: String },
-  homeTeam: { type: String },
-  awayTeam: { type: String },
-  homeTeamScore: { type: Number },
-  awayTeamScore: { type: Number },
-  outcome: { type: String },
-  matchStats: [{ type: Schema.Types.ObjectId, ref: matchStatsSchema }]
-});
+interface H2hInterface {
+  date: Date;
+  competition: string | null;
+  homeTeam: string;
+  awayTeam: string;
+  homeTeamScore: number;
+  awayTeamScore: number;
+  outcome: string;
+  matchStats: MatchStatsInterface[];
+}
 
-const resultSchema = new Schema<ResultInterface>({
-  homeScore: Number,
-  awayScore: Number,
-  matchStats: [{ type: Schema.Types.ObjectId, ref: matchStatsSchema }]
-});
+interface TeamFormRankInterface {
+  homeTeamRank: number;
+  awayTeamRank: number;
+}
 
-const matchSchema = new Schema<Match>({
-  matchId: { type: String, required: true },
-  matchStart: { type: Date, required: true },
-  competition: { type: String, required: true },
-  homeTeam: { type: String, required: true },
-  awayTeam: { type: String, required: true },
-  hotStat: { type: String },
-  overallHomeStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  overallAwayStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  overallH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  homeStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  awayStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
-  directH2hStats: [{ type: Schema.Types.ObjectId, ref: h2hSchema }],
+type MatchType = {
+  matchId: string;
+  matchStart: Date;
+  competition: string;
+  homeTeam: string;
+  awayTeam: string;
+  hotStat: string;
+  directH2hStats: H2hInterface[];
+  overallHomeStats: H2hInterface[];
+  overallAwayStats: H2hInterface[];
+  overallH2hStats: H2hInterface[];
+  homeStats: H2hInterface[];
+  awayStats: H2hInterface[];
   formStats: {
-    homeForm: { type: Object },
-    awayForm: { type: Object }
-  },
+    homeForm: TeamFormRankInterface;
+    awayForm: TeamFormRankInterface;
+  };
   result: {
-    homeScore: String,
-    awayScore: String,
-    matchStats: [{ type: Schema.Types.ObjectId, ref: resultSchema }]
+    homeScore: Number;
+    awayScore: Number;
+    matchStats: [MatchStatsInterface]
+  };
+};
+
+const matchSchema = new Schema<MatchType>(
+  {
+    matchId: { type: String, required: true },
+    matchStart: { type: Date, required: true },
+    competition: { type: String, required: true },
+    homeTeam: { type: String, required: true },
+    awayTeam: { type: String, required: true },
+    hotStat: { type: String },
+    directH2hStats: [{ type: Object }],
+    overallHomeStats: [{ type: Object }],
+    overallAwayStats: [{ type: Object }],
+    overallH2hStats: [{ type: Object }],
+    homeStats: [{ type: Object }],
+    awayStats: [{ type: Object }],
+    formStats: {
+      homeForm: { type: Object },
+      awayForm: { type: Object }
+    },
+    result: {
+      homeScore: Number,
+      awayScore: Number,
+      matchStats: [{ type: Object }]
+    }
+  },
+  {
+    collection: 'matches_apollo_test'
+    // collection: 'matches_test'
   }
-});
+);
+
 
 const Match = model('match', matchSchema);
 
