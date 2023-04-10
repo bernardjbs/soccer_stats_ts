@@ -72,8 +72,8 @@ const matchSchema = new Schema<MatchType>(
     }
   },
   {
-    collection: 'matches_apollo_test'
-    // collection: 'matches_test'
+    // collection: 'matches_apollo_test'
+    collection: 'matches_test'
   }
 );
 

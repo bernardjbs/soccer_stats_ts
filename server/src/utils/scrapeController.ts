@@ -1,18 +1,10 @@
 import { MongoClient } from 'mongodb';
 import { MatchType } from '../ts/types';
+import { processEnv } from './processEnv.js';
 
-import { fileURLToPath } from 'url';
-import path from 'path';
-import dotenv from 'dotenv';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({
-  path: path.resolve(__dirname, '../../../.env')
-});
-
-const client = new MongoClient(process.env.MONGODB_URI!);
-const DB_NAME = process.env.DB_NAME;
-const MATCHES_COLLECTION = process.env.MATCHES_COLLECTION;
+const client = new MongoClient(processEnv().MONGODB_URI!);
+const DB_NAME = processEnv().DB_NAME;
+const MATCHES_COLLECTION = processEnv().MATCHES_COLLECTION;
 const database = client.db(DB_NAME);
 const matchCollection = database.collection(MATCHES_COLLECTION!);
 

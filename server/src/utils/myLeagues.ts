@@ -12,6 +12,7 @@ export const myLeagues = [
   { country: 'FRANCE', competition: 'Ligue 2' },
   { country: 'GERMANY', competition: 'Bundesliga' },
   { country: 'GREECE', competition: 'Super League' },
+  { country: 'GREECE', competition: 'Super League - Championship Group' },
   { country: 'ITALY', competition: 'Serie A' },
   { country: 'ITALY', competition: 'Serie B' },
   { country: 'ITALY', competition: 'Coppa Italia' },

@@ -96,6 +96,7 @@ const typedefs = `#graphql
 
   type Query {
     match(matchId: String): Match
+    matches: [Match]
   }
 
   type Mutation {

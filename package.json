@@ -8,6 +8,7 @@
     "scrape": "cd server && npm run scrape", 
     "analyse": "cd server && npm run analyse", 
     "delete": "cd server && npm run delete", 
+    "save": "cd server && npm run save", 
     "dev": "cd server && npm run dev" 
   },
   "repository": {

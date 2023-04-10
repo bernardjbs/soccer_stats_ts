@@ -1,6 +1,5 @@
 import React from "react";
 import { MatchTable } from "./components/MatchTable";
-import { Scroll } from "./components/Scroll";
 import {
   ApolloClient,
   InMemoryCache,
@@ -13,7 +12,7 @@ import { MatchId } from "./components/MatchId";
 let httpLink;
 if (process.env.NODE_ENV === "development") {
   httpLink = createHttpLink({
-    uri: "http://localhost:3001/graphql",
+    uri: process.env.REACT_APP_APOLLO_URI,
   });
 } else {
   httpLink = createHttpLink({
@@ -42,7 +41,6 @@ function App() {
       <section className="m-2">
         <MatchTable />
         <MatchId />
-        {/* <Scroll /> */}
       </section>
     </ApolloProvider>
   );

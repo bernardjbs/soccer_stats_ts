@@ -2,16 +2,7 @@ import { emptyResultMatches, updateMatchResult } from './scrapeController.js';
 import { MatchType } from '../ts/types';
 import playwright, { chromium } from 'playwright';
 import { delay } from './helpers.js';
-
-import { fileURLToPath } from 'url';
-import path from 'path';
-import dotenv from 'dotenv';
 import { MatchStatsInterface } from '../ts/interfaces.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({
-  path: path.resolve(__dirname, '../../../.env')
-});
 
 // Get matches with no results
 const matches = await emptyResultMatches();
