@@ -22,7 +22,7 @@ Colors.enable();
 
 const match = async (matchId: string) => {
   const browser = await playwright.chromium.launch({
-    // headless: false // setting this to true will not run the UI
+    headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
@@ -65,43 +65,46 @@ const match = async (matchId: string) => {
 
   if (standingsCount > 0) {
     await page.locator('a[href="#/standings"]').click();
-    await page.locator('a[href="#/standings/form"]').click();
-    await page.locator('a[href="#/standings/form/home"]').click();
+    const formButton = page.locator('a[href="#/standings/form"]');
+    if (await formButton.count() > 0) {
+      await page.locator('a[href="#/standings/form"]').click();
+      await page.locator('a[href="#/standings/form/home"]').click();
+       const standingHomeFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
+       const homeFormTeam1 = await standingHomeFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
+       const homeFormTeam1Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
+       const homeFormTeam2Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
 
-    const standingHomeFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
-    const homeFormTeam1 = await standingHomeFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
-    const homeFormTeam1Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
-    const homeFormTeam2Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
+       if (homeTeam === homeFormTeam1) {
+         homeForm = {
+           homeTeamRank: parseInt(homeFormTeam1Rank),
+           awayTeamRank: parseInt(homeFormTeam2Rank)
+         };
+       } else {
+         homeForm = {
+           homeTeamRank: parseInt(homeFormTeam2Rank),
+           awayTeamRank: parseInt(homeFormTeam1Rank)
+         };
+       }
 
-    if (homeTeam === homeFormTeam1) {
-      homeForm = {
-        homeTeamRank: parseInt(homeFormTeam1Rank),
-        awayTeamRank: parseInt(homeFormTeam2Rank)
-      };
-    } else {
-      homeForm = {
-        homeTeamRank: parseInt(homeFormTeam2Rank),
-        awayTeamRank: parseInt(homeFormTeam1Rank)
-      };
+       await page.locator('a[href="#/standings/form/away"]').click();
+       const standingAwayFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
+       const awayFormTeam1 = await standingAwayFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
+       const awayFormTeam1Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
+       const awayFormTeam2Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
+
+       if (homeTeam === awayFormTeam1) {
+         awayForm = {
+           homeTeamRank: parseInt(awayFormTeam1Rank),
+           awayTeamRank: parseInt(awayFormTeam2Rank)
+         };
+       } else {
+         awayForm = {
+           homeTeamRank: parseInt(awayFormTeam2Rank),
+           awayTeamRank: parseInt(awayFormTeam1Rank)
+         };
+       }
     }
-
-    await page.locator('a[href="#/standings/form/away"]').click();
-    const standingAwayFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
-    const awayFormTeam1 = await standingAwayFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
-    const awayFormTeam1Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
-    const awayFormTeam2Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
-
-    if (homeTeam === awayFormTeam1) {
-      awayForm = {
-        homeTeamRank: parseInt(awayFormTeam1Rank),
-        awayTeamRank: parseInt(awayFormTeam2Rank)
-      };
-    } else {
-      awayForm = {
-        homeTeamRank: parseInt(awayFormTeam2Rank),
-        awayTeamRank: parseInt(awayFormTeam1Rank)
-      };
-    }
+   
   }
 
   formStats = {
@@ -204,6 +207,23 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
       outcome = 'N/A';
     }
 
+    // Checks the match status - Postponed || Match to finish
+    const matchPostponed = await page.evaluate(() => {
+      return document.querySelector('.fixedScore__status')?.textContent;
+    });
+
+    if (matchPostponed == 'Postponed' || matchPostponed == '') {
+      continue;
+    }
+
+    const matchToFinish = await page.evaluate(() => {
+      return document.querySelector('.event__stage')?.textContent;
+    });
+
+    if (matchToFinish == 'To Finish' || matchToFinish == '') {
+      continue;
+    }
+
     const [matchSummary] = await Promise.all([page.waitForEvent('popup'), await matchCollection.nth(i).click()]);
     await matchSummary.waitForLoadState();
 
@@ -254,7 +274,6 @@ const setFavMatches = async (eventHeader: playwright.Locator) => {
 
   for (let i = 0; i < eventHeader_count; i++) {
     let star;
-
     star = eventHeader.nth(i).locator('div').nth(0);
     if ((await eventHeader.nth(i).locator('div').nth(2).locator('span').nth(0).count()) == 1) {
       const country = await eventHeader.nth(i).locator('div').nth(2).locator('span').nth(0).innerHTML();
@@ -262,8 +281,8 @@ const setFavMatches = async (eventHeader: playwright.Locator) => {
       for (let idx = 0; idx < myLeagues.length; idx++) {
         if (country === myLeagues[idx].country && competition === myLeagues[idx].competition) {
           await star.click();
-          const toggleText = eventHeader.nth(i).locator('div').nth(0).locator('span').nth(2);
-          const x = eventHeader.nth(i).locator('div').nth(0).locator('svg').nth(1);
+          const toggleText = eventHeader.nth(i).locator('div').nth(0).locator('div').nth(0).locator('span').nth(1);
+          const x = eventHeader.nth(i).locator('div').nth(0).locator('div').nth(0).locator('svg').nth(0);
           if ((await toggleText.innerHTML()) === 'Remove this league from My Leagues!') {
             await x.click();
           } else if ((await toggleText.innerHTML()) === 'Add this league to My Leagues!') {
@@ -277,7 +296,7 @@ const setFavMatches = async (eventHeader: playwright.Locator) => {
 
 export const getMatchIds = async (day: string) => {
   const browser = await playwright.chromium.launch({
-    // headless: false // setting this to true will not run the UI
+    headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
@@ -290,14 +309,12 @@ export const getMatchIds = async (day: string) => {
 
   const sportNameDivs = page.locator('.sportName').locator('div');
   const SNDivsCount = await sportNameDivs.count();
-  delay(5000);
 
   let matchIds = [];
   const eventHeader = page.locator("xpath=//div[contains(@class, 'event__header')] ");
 
   // Set my matches to favourites
   await setFavMatches(eventHeader);
-
   console.log('Collecting match ids...'.green.bold);
 
   // Loop through sportDivs and get ids from favourites
@@ -306,10 +323,9 @@ export const getMatchIds = async (day: string) => {
     let matchId = await sportNameDivs.nth(i).getAttribute('id');
     const eventScore = sportNameDivs.nth(i).locator('div[class="event__score event__score--home"]');
 
-    const starCount = await sportNameDivs.nth(i).locator('div').nth(0).locator('span').locator('svg').count();
-
+    const starCount = await sportNameDivs.nth(i).locator('div').nth(0).getByRole('button').locator('svg').count();
     if (starCount > 0) {
-      star_class = await sportNameDivs.nth(i).locator('div').nth(0).locator('span').locator('svg').getAttribute('class');
+      star_class = await sportNameDivs.nth(i).locator('div').nth(0).getByRole('button').locator('svg').getAttribute('class');
       const country = await sportNameDivs.nth(i).locator('.event__title--type').innerText();
       const league = await sportNameDivs.nth(i).locator('.event__title--name').innerText();
       const competition = `${country} - ${league}`;
@@ -324,8 +340,8 @@ export const getMatchIds = async (day: string) => {
       if (await matchExists(matchId)) {
         console.log(`Match ${matchId} exists in the database, skipping...`.bg_red);
       } else {
-        const homeTeam = await sportNameDivs.nth(i).locator('.event__participant--home').innerText();
-        const awayTeam = await sportNameDivs.nth(i).locator('.event__participant--away').innerText();
+        const homeTeam = await page.locator('.event__participant--home').nth(i).innerText();
+        const awayTeam = await page.locator('.event__participant--away').nth(i).innerText();
         console.log(`${homeTeam} vs ${awayTeam} (ID: ${matchId})`);
         matchIds.push(matchId);
       }

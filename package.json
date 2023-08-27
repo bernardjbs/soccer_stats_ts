@@ -7,9 +7,12 @@
     "develop": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
     "scrape": "cd server && npm run scrape", 
     "analyse": "cd server && npm run analyse", 
+    "yellows": "cd server && npm run yellows", 
     "delete": "cd server && npm run delete", 
     "save": "cd server && npm run save", 
-    "dev": "cd server && npm run dev" 
+    "dev:watch": "cd server && npm run build:watch",
+    "dev:start": "cd server && npm run start"  ,
+    "dev": "concurrently \"npm run dev:watch\" \"npm run dev:start\""
   },
   "repository": {
     "type": "git",

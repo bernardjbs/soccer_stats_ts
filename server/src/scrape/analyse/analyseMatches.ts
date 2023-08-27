@@ -1,14 +1,15 @@
-import { H2hInterface } from '../../ts/interfaces';
-import { MatchType } from '../../ts/types';
+import { H2hInterface } from '@ts/interfaces';
+import { MatchType } from '@ts/types';
 import { MongoClient } from 'mongodb';
 
-import { dateToStr } from '../../utils/helpers.js';
+import { dateToStr, jsonConsole } from '@utils/helpers.js';
 import Colors from 'colors.ts';
 Colors.enable();
 
 import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
+import { json } from 'stream/consumers';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({
@@ -35,6 +36,7 @@ const getMatches = async () => {
 };
 
 const getTotalAvgGoals = (match: MatchType) => {
+  // jsonConsole(match.homeTeam, 4)
   const calcAvgGoals = (stats: H2hInterface[]): number => {
     const statCount = stats.length;
     let totalGoals = 0;
@@ -233,7 +235,8 @@ const analyseYellow = (match: MatchType) => {
 
   const avgYellow = (homeYellow.avgYellow + awayYellow.avgYellow + overallHomeYellow.avgYellow + overallAwayYellow.avgYellow + overallH2hYellow.avgYellow + directH2hYellow.avgYellow) / 6;
 
-  if (avgYellow > 0 || pcBTyellow > 0) console.log(`Percentage BT Yellow: ${pcBTyellow.toFixed(2)}% - Average Yellow Cards: ${avgYellow.toFixed(2)}`.yellow.bold);
+  // if (avgYellow > 0 || pcBTyellow > 0) console.log(`Percentage BT Yellow: ${pcBTyellow.toFixed(2)}% - Average Yellow Cards: ${avgYellow.toFixed(2)}`.yellow.bold);
+  if (pcBTyellow > 90) console.log(`Percentage BT Yellow: ${pcBTyellow.toFixed(2)}% - Average Yellow Cards: ${avgYellow.toFixed(2)}`.yellow.bold);
 };
 
 // Function to calculate corners
@@ -249,6 +252,11 @@ const analyseCorner = (match: MatchType) => {
 
   if (avgCorner > 0) console.log(`Average corners: ${avgCorner.toFixed(2)}`.cyan.bold);
 };
+
+// Function to analyse which team has more cards
+const analyseTeamCards = (match: MatchType) => {
+
+} 
 
 // Function to analyse home and away form
 // const analyseForm = (match: Match) => {

@@ -5,11 +5,12 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
+    "build:watch": "concurrently \"tsc -w\" \"tsc-alias -w\"",
     "start": "node build/server.js",
-    "dev": "tsc-watch --onSuccess \"node ./build/server.js\"",
     "scrape": "cd build/scrape && node match.js",
     "analyse": "cd build/scrape/analyse && node index.js",
+    "yellows": "cd build/scrape/analyse && node analyseYellowCards.js",
     "delete": "cd build/utils && node deleteMatches.js",
     "save": "cd build/utils && node saveResults.js"
   },
@@ -36,6 +37,8 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@types/mysql2": "github:types/mysql2",
     "@types/node": "^18.11.5",
+    "concurrently": "^8.0.1",
+    "tsc-alias": "^1.8.6",
     "tsc-watch": "^5.0.3",
     "typescript": "^4.9.5"
   },

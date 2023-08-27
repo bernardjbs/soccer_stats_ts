@@ -34,6 +34,7 @@ const updateResult = async (matchId: String) => {
     const homeScore = await scores.locator('span').nth(0).innerText();
     const awayScore = await scores.locator('span').nth(2).innerText();
 
+    
     const statRows = page.locator('.stat__row');
     const statsCount = await statRows.count();
 

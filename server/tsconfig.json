@@ -30,10 +30,14 @@
     "module": "ESNext" /* Specify what module code is generated. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
     "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
-    // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    "baseUrl": ".",                                  /* Specify the base directory to resolve non-relative module names. */
     "paths": {
-      "@utils/*": ["./src/utils/*"],
-      "@config/*": ["./src/config/*"],
+      "@config/*": ["src/config/*"],
+      "@models/*": ["src/models/*"],
+      "@schemas/*": ["src/schemas/*"],
+      "@scrape/*": ["src/scrape/*"],
+      "@ts/*": ["src/ts/*"],
+      "@utils/*": ["src/utils/*"],
       "@root": ["."]
     }
      /* Specify a set of entries that re-map imports to additional lookup locations. */,
