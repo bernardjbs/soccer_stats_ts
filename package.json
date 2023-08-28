@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "develop": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
-    "scrape": "cd server && npm run scrape", 
-    "analyse": "cd server && npm run analyse", 
-    "yellows": "cd server && npm run yellows", 
-    "delete": "cd server && npm run delete", 
-    "save": "cd server && npm run save", 
+    "scrape": "cd server && npm run scrape",
+    "analyse": "cd server && npm run analyse",
+    "yellows": "cd server && npm run yellows",
+    "delete": "cd server && npm run delete",
+    "save": "cd server && npm run save",
     "dev:watch": "cd server && npm run build:watch",
-    "dev:start": "cd server && npm run start"  ,
+    "dev:start": "cd server && npm run start",
     "dev": "concurrently \"npm run dev:watch\" \"npm run dev:start\""
   },
   "repository": {
@@ -27,5 +27,8 @@
   "homepage": "https://github.com/bernardjbs/soccer_stats_ts#readme",
   "devDependencies": {
     "concurrently": "^7.6.0"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.2"
   }
 }

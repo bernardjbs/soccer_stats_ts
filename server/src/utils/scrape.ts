@@ -312,7 +312,8 @@ export const getMatchIds = async (day: string) => {
     await page.waitForTimeout(5000)
     divs = await page.$$('div');
   }
-
+  
+  divs = await page.$$('div');
   let matchIds: string[] = [];
   let foundObject: boolean = false;
   let eventData = {
