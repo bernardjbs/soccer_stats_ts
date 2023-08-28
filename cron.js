@@ -1,7 +1,6 @@
 const cron = require("node-cron");
 const { exec } = require("child_process");
 
-// Function to execute the command with retries
 const executeWithRetries = async (command, retries) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     console.log(`Attempt ${attempt} - Running command: ${command}`);
@@ -31,7 +30,6 @@ const executeWithRetries = async (command, retries) => {
   }
 };
 
-// Schedule the task to run every day at 15:12 (3:12 PM)
 cron.schedule("00 08 * * *", () => {
   console.log("Scheduled task started...");
 
