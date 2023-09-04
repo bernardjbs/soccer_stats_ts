@@ -3,6 +3,7 @@ import { MatchType } from '../ts/types';
 import playwright, { chromium } from 'playwright';
 import { delay } from './helpers.js';
 import { MatchStatsInterface } from '../ts/interfaces.js';
+import { processEnv } from '@utils/processEnv.js';
 
 // Get matches with no results
 const matches = await emptyResultMatches();
@@ -14,9 +15,8 @@ const updateResult = async (matchId: String) => {
   const browser = await chromium.launch({ headless: true }); //Headless false = With browser
   const context = await browser.newContext();
   const page = await context.newPage();
-  // await page.goto('https://www.flashscore.com/');
 
-  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary/match-summary`);
+  await page.goto(`${processEnv().SCRAPE_SOURCE_01}/match/${matchId}/#/match-summary/match-summary`);
   await delay(1000);
 
   const matchStatus = await page.evaluate(() => {

@@ -44,3 +44,48 @@ cron.schedule("00 08 * * *", () => {
       console.error("Scheduled task failed");
     });
 });
+
+cron.schedule("00 10 * * *", () => {
+  console.log("Scheduled task started...");
+
+  const command = "npm run save";
+  const maxRetries = 3;
+
+  executeWithRetries(command, maxRetries)
+    .then(() => {
+      console.log("Scheduled task completed");
+    })
+    .catch(() => {
+      console.error("Scheduled task failed");
+    });
+});
+
+cron.schedule("00 14 * * *", () => {
+  console.log("Scheduled task started...");
+
+  const command = "npm run save";
+  const maxRetries = 3;
+
+  executeWithRetries(command, maxRetries)
+    .then(() => {
+      console.log("Scheduled task completed");
+    })
+    .catch(() => {
+      console.error("Scheduled task failed");
+    });
+});
+
+cron.schedule("00 18 * * *", () => {
+  console.log("Scheduled task started...");
+
+  const command = "npm run save";
+  const maxRetries = 3;
+
+  executeWithRetries(command, maxRetries)
+    .then(() => {
+      console.log("Scheduled task completed");
+    })
+    .catch(() => {
+      console.error("Scheduled task failed");
+    });
+});

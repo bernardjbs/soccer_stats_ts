@@ -21,12 +21,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  // MySQL username,
-  user: 'root',
-  // MySQL password
-  password: 'sql6155',
-  database: 'soccer'
+  host: processEnv().DB_CONNECTION,
+  user: processEnv().DB_USERNAME,
+  password: processEnv().DB_PASSWORD,
+  database: processEnv().DB_DATABASE
 });
 
 const saveAllMatches = async () => {

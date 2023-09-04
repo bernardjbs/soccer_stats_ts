@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { delay } from '../utils/helpers.js';
 import { MatchStatsInterface } from '../ts/interfaces.js';
 import { saveScore, saveStats } from '../utils/mongoToSql.js';
-import { match } from 'assert';
+import { processEnv } from '@utils/processEnv.js';
 
 async function fetchMatchIds() {
   const apiUrl = 'http://soccer.test/api/matches';
@@ -24,7 +24,7 @@ const saveResult = async (matchId: string) => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary/match-summary`);
+  await page.goto(`${processEnv().SCRAPE_SOURCE_01}/match/${matchId}/#/match-summary/match-summary`);
   await delay(1000);
 
   const matchStatus = await page.evaluate(() => {

@@ -7,18 +7,9 @@ import { random, delay, strToDateTime } from './helpers.js';
 import { MatchType } from '../ts/types';
 import { saveMatch, matchExists } from './scrapeController.js';
 import { myLeagues } from './myLeagues.js';
-
-import { fileURLToPath } from 'url';
-import path from 'path';
-import dotenv from 'dotenv';
+import { processEnv } from '@utils/processEnv.js';
 import { count, table } from 'console';
 import { type } from 'os';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({
-  path: path.resolve(__dirname, '../../../.env')
-});
-
 Colors.enable();
 
 const match = async (matchId: string) => {
@@ -27,7 +18,7 @@ const match = async (matchId: string) => {
   });
 
   const page = await browser.newPage();
-  await page.goto(`https://www.flashscore.com/match/${matchId}/#/match-summary`);
+  await page.goto(`${processEnv().SCRAPE_SOURCE_01}/match/${matchId}/#/match-summary`);
 
   const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':');
   const homeTeam: string = await page.locator('.duelParticipant__home').innerText();
@@ -301,7 +292,8 @@ export const getMatchIds = async (day: string) => {
   });
 
   const page = await browser.newPage();
-  await page.goto('https://www.flashscore.com');
+  console.log(`scrape site: ${processEnv().SCRAPE_SOURCE_01}`);
+  await page.goto(`${processEnv().SCRAPE_SOURCE_01}`);
   let divs: any;
 
   if (day === 'nextDay') {
