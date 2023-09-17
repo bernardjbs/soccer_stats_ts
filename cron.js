@@ -1,6 +1,8 @@
 const cron = require("node-cron");
 const { exec } = require("child_process");
 
+console.log('Cron loaded. Waiting for scheduled tasks... ');
+
 const executeWithRetries = async (command, retries) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     console.log(`Attempt ${attempt} - Running command: ${command}`);

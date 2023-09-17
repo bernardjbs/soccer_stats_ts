@@ -258,33 +258,6 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
   return statsCollection;
 };
 
-const setFavMatches = async (eventHeader: playwright.Locator) => {
-  console.log('Selecting Competitions...'.green.bold);
-  await delay(2000);
-  const eventHeader_count = await eventHeader.count();
-
-  for (let i = 0; i < eventHeader_count; i++) {
-    let star;
-    star = eventHeader.nth(i).locator('div').nth(0);
-    if ((await eventHeader.nth(i).locator('div').nth(2).locator('span').nth(0).count()) == 1) {
-      const country = await eventHeader.nth(i).locator('div').nth(2).locator('span').nth(0).innerHTML();
-      const competition = await eventHeader.nth(i).locator('div').nth(2).locator('span').nth(1).innerHTML();
-      for (let idx = 0; idx < myLeagues.length; idx++) {
-        if (country === myLeagues[idx].country && competition === myLeagues[idx].competition) {
-          await star.click();
-          const toggleText = eventHeader.nth(i).locator('div').nth(0).locator('div').nth(0).locator('span').nth(1);
-          const x = eventHeader.nth(i).locator('div').nth(0).locator('div').nth(0).locator('svg').nth(0);
-          if ((await toggleText.innerHTML()) === 'Remove this league from My Leagues!') {
-            await x.click();
-          } else if ((await toggleText.innerHTML()) === 'Add this league to My Leagues!') {
-            await toggleText.click();
-          }
-        }
-      }
-    }
-  }
-};
-
 export const getMatchIds = async (day: string) => {
   console.log('Selecting Competitions...'.green.bold);
   const browser = await playwright.chromium.launch({
@@ -299,8 +272,6 @@ export const getMatchIds = async (day: string) => {
   if (day === 'nextDay') {
     const nextDay = page.locator('.calendarCont').locator('div').nth(0).locator('button[title="Next day"]');
     await nextDay.click();
-    const eventLocator = page.locator('.event');
-    // await eventLocator.waitFor({ state: 'attached' });
     await page.waitForTimeout(5000)
     divs = await page.$$('div');
   }
@@ -317,7 +288,7 @@ export const getMatchIds = async (day: string) => {
     const className = await div.getAttribute('class');
     const id = await div.getAttribute('id');
 
-    if (className === 'event__header' || className === 'event__header top') {
+    if (className === 'event__header' || className === 'event__header top pinned') {
       const country = await div.$('.event__title--type');
       const competition = await div.$('.event__title--name');
 
@@ -341,7 +312,7 @@ export const getMatchIds = async (day: string) => {
     }
 
     if (foundObject && className === 'event__titleBox') {
-      console.log(`\nSetting Match IDs for competition: ${eventData.competition}`.green.bold);
+      console.log(`\nSetting Match IDs for competition: ${eventData.country} ${eventData.competition}`.green.bold);
     }
 
     if (foundObject && id && id.startsWith('g_1')) {
