@@ -175,13 +175,10 @@ const analyseBTTS = (match: MatchType) => {
   const overallH2hBTTS = calcAnalysis('calcBTTS', match.overallH2hStats);
   const directH2hBTTS = calcAnalysis('calcBTTS', match.directH2hStats);
   const totalBTTS_score = homeBTTS + awayBTTS + overallHomeBTTS + overallAwayBTTS + overallH2hBTTS + directH2hBTTS;
-  // if (homeBTTS > 0) console.log(`Home Team BTTS is at least 4/5`.magenta);
-  // if (awayBTTS > 0) console.log(`Away Team BTTS is at least 4/5`.magenta);
-  // if (overallHomeBTTS > 0) console.log(`Overall Home BTTS is at least 4/5`.magenta);
-  // if (overallAwayBTTS > 0) console.log(`Overall Away BTTS is at least 4/5`.magenta);
-  // if (overallH2hBTTS > 0) console.log(`Overall Head To Head BTTS is at least 4/5`.magenta);
-  // if (directH2hBTTS > 0) console.log(`Direct H2H BTTS is at least 4/5`.cyan);
-  if (totalBTTS_score > 3) console.log(`TOTAL BTTS score is at least 4/6`.bg_magenta);
+
+  let btts: boolean = false;
+  totalBTTS_score > 3 ? (btts = true) : (btts = false);
+  return btts;
 };
 
 // Function to analyse Over 2.5 Goals
@@ -193,8 +190,19 @@ const analyseOver = (match: MatchType) => {
   const overallH2hOver = calcAnalysis('calcOver', match.overallH2hStats);
   const directH2hOver = calcAnalysis('calcOver', match.directH2hStats);
   const totalAvgGoals = getTotalAvgGoals(match);
+
+  let over = {
+    analyse: false,
+    totalAvgGoals: totalAvgGoals
+  };
+
   const totalOverScore = homeOver + awayOver + overallHomeOver + overallAwayOver + overallH2hOver + directH2hOver;
-  if (totalOverScore > 3 && totalAvgGoals > 2.5) console.log(`Over 2.5 score is at least 4/6 with Average ${totalAvgGoals.toFixed(2)}`.green);
+
+  if (totalOverScore > 3 && totalAvgGoals > 2.5) {
+    over.analyse = true;
+  }
+
+  return over;
 };
 
 // Function to analyse Under 2.5 Goals
@@ -207,19 +215,51 @@ const analyseUnder = (match: MatchType) => {
   const directH2hOver = calcAnalysis('calcUnder', match.directH2hStats);
   const totalAvgGoals = getTotalAvgGoals(match);
   const totalUnderScore = homeOver + awayOver + overallHomeOver + overallAwayOver + overallH2hOver + directH2hOver;
-  if (totalUnderScore > 3 && totalAvgGoals < 2.5) console.log(`Under 2.5 score is at least 4/6 with Average ${totalAvgGoals.toFixed(2)}`.yellow.bold);
+
+  let under = {
+    analyse: false,
+    totalAvgGoals: totalAvgGoals
+  };
+
+  if (totalUnderScore > 3 && totalAvgGoals < 2.5) {
+    under.analyse = true
+  } 
+
+  return under;
 };
 
 // Function to analyse head to head winners
 const analyseWinner = (match: MatchType) => {
   // Winners
+  let winner = {
+    overallHome: false,
+    overallAway: false,
+    directH2hHome: false,
+    directH2hAway: false
+  };
+
   const overallH2hWinner = calcH2hWinner(match.overallH2hStats, match.homeTeam, match.awayTeam);
-  if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'home') console.log(`OVERALL - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.blue);
-  if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'away') console.log(`OVERALL - ${match.awayTeam} WON ${match.homeTeam} at least 4/5 times`.blue);
+
+  if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'home') {
+    winner.overallHome = true
+  } else if (overallH2hWinner.score > 0 && overallH2hWinner.team === 'away') {
+    winner.overallAway = true
+  };
+    
+  // overallH2hWinner.score > 0 && overallH2hWinner.team === 'home' ? (winner.overallHome = true) : (winner.overallAway = false);
+  // overallH2hWinner.score > 0 && overallH2hWinner.team === 'away' ? (winner.overallHome = false) : (winner.overallAway = true);
 
   const H2H_WINNER_score = calcH2hWinner(match.directH2hStats, match.homeTeam, match.awayTeam);
-  if (H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'home') console.log(`DIRECT H2H - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.bg_green);
-  if (H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'away') console.log(`DIRECT H2H - ${match.awayTeam} WON ${match.homeTeam} at least 4/5 times`.bg_green);
+
+  if (H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'home') {
+    winner.directH2hHome = true
+  } else if (H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'away') { 
+    winner.directH2hAway = true
+  } ;
+    // H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'home' ? (winner.directH2hHome = true) : (winner.directH2hAway = false);
+    // H2H_WINNER_score.score > 0 && H2H_WINNER_score.team === 'away' ? (winner.directH2hHome = false) : (winner.directH2hAway = true);
+
+  return winner;
 };
 
 // Function to calculate yellow cards
@@ -232,11 +272,19 @@ const analyseYellow = (match: MatchType) => {
   const directH2hYellow = calcYellow(match.directH2hStats);
 
   const pcBTyellow = (homeYellow.pcBTyellow + awayYellow.pcBTyellow + overallHomeYellow.pcBTyellow + overallAwayYellow.pcBTyellow + overallH2hYellow.pcBTyellow + directH2hYellow.pcBTyellow) / 6;
-
   const avgYellow = (homeYellow.avgYellow + awayYellow.avgYellow + overallHomeYellow.avgYellow + overallAwayYellow.avgYellow + overallH2hYellow.avgYellow + directH2hYellow.avgYellow) / 6;
 
-  // if (avgYellow > 0 || pcBTyellow > 0) console.log(`Percentage BT Yellow: ${pcBTyellow.toFixed(2)}% - Average Yellow Cards: ${avgYellow.toFixed(2)}`.yellow.bold);
-  if (pcBTyellow > 90) console.log(`Percentage BT Yellow: ${pcBTyellow.toFixed(2)}% - Average Yellow Cards: ${avgYellow.toFixed(2)}`.yellow.bold);
+  let yellow = {
+    analyse: false,
+    percentage: pcBTyellow, 
+    avgYellow: avgYellow
+  };
+
+  if (pcBTyellow > 90) {
+    yellow.analyse = true;
+  }
+
+  return yellow;
 };
 
 // Function to calculate corners
@@ -250,13 +298,20 @@ const analyseCorner = (match: MatchType) => {
 
   const avgCorner = (homeCorners + awayCorners + overallHomeCorners + overallAwayCorners + overallH2hCorners + directH2hCorners) / 6;
 
-  if (avgCorner > 0) console.log(`Average corners: ${avgCorner.toFixed(2)}`.cyan.bold);
+  let corner = {
+    analyse: false,
+    avgCorner: avgCorner
+  };
+
+  if (avgCorner > 0) {
+    corner.analyse = true;
+  } 
+
+  return corner;
 };
 
 // Function to analyse which team has more cards
-const analyseTeamCards = (match: MatchType) => {
-
-} 
+const analyseTeamCards = (match: MatchType) => {};
 
 // Function to analyse home and away form
 // const analyseForm = (match: Match) => {
@@ -283,14 +338,28 @@ export const analyseMatches = async () => {
   try {
     const matches: MatchType[] = await getMatches();
     matches.map((match: MatchType) => {
-      console.log(`\n${match.competition} - ${match.homeTeam} VS ${match.awayTeam} | STARTING ${dateToStr(match.matchStart)}`.red);
-      analyseBTTS(match);
-      analyseOver(match);
-      analyseUnder(match);
-      analyseWinner(match);
-      analyseYellow(match);
-      analyseCorner(match);
-      // analyseForm(match);
+      
+      const winner = analyseWinner(match);
+      const btts = analyseBTTS(match);
+      const over = analyseOver(match);
+      const under = analyseUnder(match);
+      const yellow = analyseYellow(match);
+      const corner = analyseCorner(match);
+
+      if ( winner.directH2hHome || winner.directH2hAway || winner.overallHome || winner.overallAway || btts || over.analyse || under.analyse || yellow.analyse || corner.analyse ){
+        console.log(`\n${match.competition} - ${match.homeTeam} VS ${match.awayTeam} | STARTING ${dateToStr(match.matchStart)}`.red);
+
+        if (winner.directH2hHome) console.log(`DIRECT H2H - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.bg_green);
+        if (winner.directH2hAway) console.log(`DIRECT H2H - ${match.awayTeam} WON ${match.homeTeam} at least 4/5 times`.bg_green);
+        if (winner.overallHome) console.log(`OVERALL - ${match.homeTeam} WON ${match.awayTeam} at least 4/5 times`.blue);
+        if (winner.overallAway) console.log(`OVERALL - ${match.awayTeam} WON ${match.homeTeam} at least 4/5 times`.blue);
+
+        if (btts) console.log(`TOTAL BTTS score is at least 4/6`.bg_magenta);
+        if (over.analyse) console.log(`Over 2.5 score is at least 4/6 with Average ${over.totalAvgGoals.toFixed(2)}`.green);
+        if (under.analyse) console.log(`Under 2.5 score is at least 4/6 with Average ${under.totalAvgGoals.toFixed(2)}`.yellow.bold);
+        if (yellow.analyse) console.log(`Percentage BT Yellow: ${yellow.percentage.toFixed(2)}% - Average Yellow Cards: ${yellow.avgYellow.toFixed(2)}`.yellow.bold);
+        if (corner.analyse) console.log(`Average corners: ${corner.avgCorner.toFixed(2)}`.cyan.bold);
+      }
     });
   } catch (error) {
     console.log(error);
