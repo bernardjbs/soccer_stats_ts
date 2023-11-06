@@ -1,24 +1,16 @@
-import { H2hInterface } from '@ts/interfaces';
-import { MatchType } from '@ts/types';
+import { H2hInterface } from '@ts/interfaces.js';
+import { MatchType } from '@ts/types.js';
 import { MongoClient } from 'mongodb';
-
+import { processEnv } from '@utils/processEnv.js';
 import { dateToStr, jsonConsole } from '@utils/helpers.js';
 import Colors from 'colors.ts';
+import { json } from 'stream/consumers';
+
 Colors.enable();
 
-import { fileURLToPath } from 'url';
-import path from 'path';
-import dotenv from 'dotenv';
-import { json } from 'stream/consumers';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({
-  path: path.resolve(__dirname, '../../../../.env')
-});
-
-const client = new MongoClient(process.env.MONGODB_URI!);
-const DB_NAME = process.env.DB_NAME;
-const MATCHES_COLLECTION = process.env.MATCHES_COLLECTION;
+const client = new MongoClient(processEnv().MONGODB_URI!);
+const DB_NAME = processEnv().DB_NAME;
+const MATCHES_COLLECTION = processEnv().MATCHES_COLLECTION;
 
 // Fetch the matches to be analysed from database
 const getMatches = async () => {

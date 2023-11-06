@@ -1,4 +1,4 @@
-import { TeamFormRankInterface } from './../ts/interfaces.d';
+// import { TeamFormRankInterface } from '@ts/interfaces.d.js';
 const typedefs = `#graphql
     scalar Date
 

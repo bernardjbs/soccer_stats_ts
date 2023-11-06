@@ -1,8 +1,8 @@
 import playwright, { chromium } from 'playwright';
 import fetch from 'node-fetch';
-import { delay } from '../utils/helpers.js';
-import { MatchStatsInterface } from '../ts/interfaces.js';
-import { saveScore, saveStats } from '../utils/mongoToSql.js';
+import { delay } from '@utils/helpers.js';
+import { MatchStatsInterface } from '@ts/interfaces.js';
+import { saveScore, saveStats } from '@utils/mongoToSql.js';
 import { processEnv } from '@utils/processEnv.js';
 
 async function fetchMatchIds() {

@@ -1,4 +1,4 @@
-import { getMatchIds, buildStats } from '../utils/scrape.js';
+import { getMatchIds, buildStats } from '@utils/scrape.js';
 
 // const matchIds = await getMatchIds('today');
 const matchIds = await getMatchIds('nextDay');

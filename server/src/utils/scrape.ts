@@ -1,10 +1,10 @@
-import { TeamFormRankInterface } from '../ts/interfaces';
+import { TeamFormRankInterface } from '@ts/interfaces';
 import playwright from 'playwright';
-import { MatchStatsInterface, H2hInterface } from '../ts/interfaces';
+import { MatchStatsInterface, H2hInterface } from '@ts/interfaces';
 import util, { types } from 'util';
 import Colors from 'colors.ts';
 import { random, delay, strToDateTime } from './helpers.js';
-import { MatchType } from '../ts/types';
+import { MatchType } from '@ts/types';
 import { saveMatch, matchExists } from './scrapeController.js';
 import { myLeagues } from './myLeagues.js';
 import { processEnv } from '@utils/processEnv.js';

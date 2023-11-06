@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { MatchType } from '../ts/types';
+import { MatchType } from '@ts/types.js';
 import { processEnv } from './processEnv.js';
 
 const client = new MongoClient(processEnv().MONGODB_URI!);

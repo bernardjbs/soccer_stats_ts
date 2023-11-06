@@ -1,8 +1,8 @@
 import { emptyResultMatches, updateMatchResult } from './scrapeController.js';
-import { MatchType } from '../ts/types';
+import { MatchType } from '@ts/types.js';
 import playwright, { chromium } from 'playwright';
 import { delay } from './helpers.js';
-import { MatchStatsInterface } from '../ts/interfaces.js';
+import { MatchStatsInterface } from '@ts/interfaces.js';
 import { processEnv } from '@utils/processEnv.js';
 
 // Get matches with no results

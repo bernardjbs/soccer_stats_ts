@@ -1,16 +1,8 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import { processEnv } from '@utils/processEnv.js';
 
-import { fileURLToPath } from 'url';
-import path from 'path';
-import dotenv from 'dotenv';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({
-  path: path.resolve(__dirname, '../../../.env')
-});
-
-const secret = process.env.JWT_SECRET as string;
+const secret = processEnv().JWT_SECRET as string;
 const expiration = '2h';
 
 const authMiddleware = ({ req }: { req: express.Request }) => {

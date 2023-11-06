@@ -29,6 +29,7 @@
     "concurrently": "^7.6.0"
   },
   "dependencies": {
+    "@types/node-fetch": "^2.6.8",
     "node-cron": "^3.0.2"
   }
 }
