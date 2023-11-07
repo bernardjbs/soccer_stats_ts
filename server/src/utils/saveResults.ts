@@ -1,4 +1,4 @@
-import { emptyResultMatches, updateMatchResult } from './scrapeController.js';
+import { deleteMatches, emptyResultMatches, updateMatchResult } from './scrapeController.js';
 import { MatchType } from '@ts/types.js';
 import playwright, { chromium } from 'playwright';
 import { delay } from './helpers.js';
@@ -9,7 +9,7 @@ import { processEnv } from '@utils/processEnv.js';
 const matches = await emptyResultMatches();
 
 console.log(`Matches with empty results: ${matches.length}`)
-const updateResult = async (matchId: String) => {
+const updateResult = async (matchId: string) => {
   console.log(`Saving result for match: ${matchId}`);
 
   const browser = await chromium.launch({ headless: true }); //Headless false = With browser
@@ -25,7 +25,12 @@ const updateResult = async (matchId: String) => {
 
   if (matchStatus === 'Finished') {
     const statsBtnLocator = page.locator('a[href="#/match-summary/match-statistics"]');
-    if ((await statsBtnLocator.count()) == 0) return 0;
+    
+    if ((await statsBtnLocator.count()) == 0) {
+      console.log(`Deleting match ${matchId}`)
+      deleteMatches([matchId])
+      return 0;
+    }
 
     await statsBtnLocator.click();
     await delay(2000);

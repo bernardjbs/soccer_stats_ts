@@ -36,3 +36,4 @@ const matchIds = [
 ];
 
 deleteMatches(matchIds);
+process.exit();

@@ -1,6 +1,9 @@
 import { MongoClient } from 'mongodb';
 import { MatchType } from '@ts/types.js';
 import { processEnv } from './processEnv.js';
+import Colors from 'colors.ts';
+
+Colors.enable();
 
 const client = new MongoClient(processEnv().MONGODB_URI!);
 const DB_NAME = processEnv().DB_NAME;
@@ -9,18 +12,12 @@ const database = client.db(DB_NAME);
 const matchCollection = database.collection(MATCHES_COLLECTION!);
 
 export const deleteMatches = async (matchIds: string[]) => {
-  let count = 0;
   matchIds.map(async (matchId, i) => {
     try {
       await matchCollection.deleteOne({ matchId: matchId });
-      console.log(`A document was deleted with the matchId: ${matchId}`);
+      console.log(`A document was deleted with the matchId: ${matchId}`.red);
     } catch (error) {
       console.log(error);
-    } finally {
-      count = count + 1;
-      if (count === matchIds.length) {
-        process.exit();
-      }
     }
   });
 };
@@ -28,7 +25,7 @@ export const deleteMatches = async (matchIds: string[]) => {
 export const saveMatch = async (match: MatchType) => {
   try {
     const result = await matchCollection.insertOne(match);
-    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+    console.log(`A document was inserted with the _id: ${result.insertedId}`.green);
   } finally {
     // await client.close();
   }
@@ -47,7 +44,7 @@ export const matchExists = async (matchId: String) => {
 export const updateMatchResult = async (matchId: String, results: Object) => {
   try {
     await matchCollection.updateOne({ matchId: matchId }, { $set: { result: results } });
-    console.log(`Result Updated`);
+    console.log(`Result Updated`.green);
   } catch (error) {
     console.log(error);
   } 
@@ -56,7 +53,7 @@ export const updateMatchResult = async (matchId: String, results: Object) => {
 export const emptyResultMatches = async () => {
   try {
     const filterDateTime = new Date();
-    filterDateTime.setHours(filterDateTime.getHours() - 2);
+    filterDateTime.setHours(filterDateTime.getHours() - 3);
     const matches = await matchCollection
       .find({
         result: [],
