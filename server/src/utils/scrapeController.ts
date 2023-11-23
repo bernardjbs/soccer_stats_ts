@@ -12,14 +12,14 @@ const database = client.db(DB_NAME);
 const matchCollection = database.collection(MATCHES_COLLECTION!);
 
 export const deleteMatches = async (matchIds: string[]) => {
-  matchIds.map(async (matchId, i) => {
+  for (let i = 0; i < matchIds.length; i++) {
     try {
-      await matchCollection.deleteOne({ matchId: matchId });
-      console.log(`A document was deleted with the matchId: ${matchId}`.red);
+      await matchCollection.deleteOne({ matchId: matchIds[i] });
+      console.log(`A document was deleted with the matchId: ${matchIds[i]}`.red);
     } catch (error) {
       console.log(error);
     }
-  });
+  }
 };
 
 export const saveMatch = async (match: MatchType) => {
@@ -47,7 +47,7 @@ export const updateMatchResult = async (matchId: String, results: Object) => {
     console.log(`Result Updated`.green);
   } catch (error) {
     console.log(error);
-  } 
+  }
 };
 
 export const emptyResultMatches = async () => {
