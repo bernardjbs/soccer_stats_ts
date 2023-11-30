@@ -8,11 +8,11 @@ import { processEnv } from '@utils/processEnv.js';
 // Get matches with no results
 const matches = await emptyResultMatches();
 
-console.log(`Matches with empty results: ${matches.length}`)
+console.log(`Matches with empty results: ${matches.length}`);
 const updateResult = async (matchId: string) => {
   console.log(`Saving result for match: ${matchId}`);
 
-  const browser = await chromium.launch({ headless: true }); //Headless false = With browser
+  const browser = await chromium.launch({ headless: false }); //Headless false = With browser
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -25,10 +25,10 @@ const updateResult = async (matchId: string) => {
 
   if (matchStatus === 'Finished') {
     const statsBtnLocator = page.locator('a[href="#/match-summary/match-statistics"]');
-    
+
     if ((await statsBtnLocator.count()) == 0) {
-      console.log(`Deleting match ${matchId}`)
-      deleteMatches([matchId])
+      console.log(`Deleting match ${matchId}`);
+      deleteMatches([matchId]);
       return 0;
     }
 
@@ -39,13 +39,12 @@ const updateResult = async (matchId: string) => {
     const homeScore = await scores.locator('span').nth(0).innerText();
     const awayScore = await scores.locator('span').nth(2).innerText();
 
-    
-    const statRows = page.locator('.stat__row');
+    const statRows = page.locator('._row_17bol_9');
     const statsCount = await statRows.count();
 
-    const statsCategory = statRows.locator('.stat__categoryName');
-    const statsHome = statRows.locator('.stat__homeValue');
-    const statsAway = statRows.locator('.stat__awayValue');
+    const statsCategory = statRows.locator('._category_1ofrm_5');
+    const statsHome = statRows.locator('._homeValue_rvaa1_10');
+    const statsAway = statRows.locator('._awayValue_rvaa1_14');
 
     let matchStats: MatchStatsInterface[] = [];
 
@@ -72,17 +71,18 @@ const updateResult = async (matchId: string) => {
   page.close();
 };
 
-let matchIds: string[] = []
+let matchIds: string[] = [];
 
 matches.map((match: MatchType) => {
-  matchIds.push(match.matchId)
+  matchIds.push(match.matchId);
 });
 
 // The count for number of matche results to be updated at one run
 let count = 50;
 
 // Update a single matchId
-// updateResult('4lyB61B6');
+// updateResult('6TH3rY1G');
+
 
 const updateResults = async (matchIds: string[], interval: number = 1000) => {
   if (matchIds.length == 0 || count == 0) {
