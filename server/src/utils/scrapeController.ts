@@ -56,7 +56,11 @@ export const emptyResultMatches = async () => {
     filterDateTime.setHours(filterDateTime.getHours() - 3);
     const matches = await matchCollection
       .find({
-        result: [],
+        $or: [
+          { result: { $exists: false } }, // Exists? 
+          { result: { $eq: [] } }, // Empty array? 
+          { result: {} } // Empty object? 
+        ],
         matchStart: { $lt: filterDateTime }
       })
       .toArray()

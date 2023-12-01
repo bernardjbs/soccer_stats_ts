@@ -12,7 +12,7 @@ console.log(`Matches with empty results: ${matches.length}`);
 const updateResult = async (matchId: string) => {
   console.log(`Saving result for match: ${matchId}`);
 
-  const browser = await chromium.launch({ headless: false }); //Headless false = With browser
+  const browser = await chromium.launch({ headless: true }); //Headless false = With browser
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -81,13 +81,12 @@ matches.map((match: MatchType) => {
 let count = 50;
 
 // Update a single matchId
-// updateResult('6TH3rY1G');
-
+// updateResult('4lyB61B6');
 
 const updateResults = async (matchIds: string[], interval: number = 1000) => {
   if (matchIds.length == 0 || count == 0) {
     // stop when there's no more items to process
-    console.log('SAVED RESULTS - ALL DONE');
+    console.log('ALL DONE');
     process.exit();
     return;
   }
@@ -95,7 +94,9 @@ const updateResults = async (matchIds: string[], interval: number = 1000) => {
   await updateResult(matchIds[0]);
 
   setTimeout(
-    () => {updateResults(matchIds.slice(1), interval)}, // wrap in an arrow function to defer evaluation
+    () => {
+      updateResults(matchIds.slice(1), interval);
+    }, // wrap in an arrow function to defer evaluation
     interval
   );
 };

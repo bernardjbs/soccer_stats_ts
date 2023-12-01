@@ -340,7 +340,10 @@ export const buildStats = async (matchIds: string[], interval: number = random(1
   if (matchIds.length === 0) {
     // stop when there's no more items to process
     console.log('ALL DONE');
-    process.exit();
+
+    // if (exit) process.exit();
+
+    return;
   }
 
   await match(matchIds[0]);
@@ -352,10 +355,8 @@ export const buildStats = async (matchIds: string[], interval: number = random(1
         interval
       );
    */
-  
   await new Promise<void>((resolve) => {
     setTimeout(() => resolve(), interval);
   });
-
   await buildStats(matchIds.slice(1), interval);
 };
