@@ -169,7 +169,7 @@ const match = async (matchId: string) => {
   };
   // console.log(util.inspect(match, { colors: true, depth: 4 }));
   console.log('Save to Database');
-  saveMatch(match);
+  await saveMatch(match);
   await browser.close();
 };
 
@@ -337,16 +337,25 @@ export const getMatchIds = async (day: string) => {
 };
 
 export const buildStats = async (matchIds: string[], interval: number = random(1000, 3000)) => {
-  if (matchIds.length == 0) {
+  if (matchIds.length === 0) {
     // stop when there's no more items to process
     console.log('ALL DONE');
     process.exit();
-    return;
   }
+
   await match(matchIds[0]);
 
-  setTimeout(
-    () => buildStats(matchIds.slice(1), interval), // wrap in an arrow function to defer evaluation
-    interval
-  );
+  /*
+      ***** Use setTimeout inside a Promise to ensure asynchronous behavior INSTEAD of: 
+      setTimeout(
+        () => buildStats(matchIds.slice(1), interval), // wrap in an arrow function to defer evaluation
+        interval
+      );
+   */
+  
+  await new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), interval);
+  });
+
+  await buildStats(matchIds.slice(1), interval);
 };

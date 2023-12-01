@@ -87,7 +87,7 @@ let count = 50;
 const updateResults = async (matchIds: string[], interval: number = 1000) => {
   if (matchIds.length == 0 || count == 0) {
     // stop when there's no more items to process
-    console.log('ALL DONE');
+    console.log('SAVED RESULTS - ALL DONE');
     process.exit();
     return;
   }
