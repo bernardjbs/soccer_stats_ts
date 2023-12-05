@@ -14,7 +14,7 @@ Colors.enable();
 
 const match = async (matchId: string) => {
   const browser = await playwright.chromium.launch({
-    headless: true // setting this to true will not run the UI
+    headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();
@@ -174,6 +174,8 @@ const match = async (matchId: string) => {
 };
 
 const getStats = async (matches: playwright.Locator, page: playwright.Page, lastMatchesType: string) => {
+  console.log('Getting Stats');
+  await delay(10000)
   let statsCollection: H2hInterface[] = [];
   const matchCollection = matches.locator('.rows').locator('.h2h__row');
   const count = await matchCollection.count();
@@ -261,7 +263,7 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 export const getMatchIds = async (day: string) => {
   console.log('Selecting Competitions...'.green.bold);
   const browser = await playwright.chromium.launch({
-    headless: true // setting this to true will not run the UI
+    headless: false // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();

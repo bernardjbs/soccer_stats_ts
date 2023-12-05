@@ -18,9 +18,9 @@ const analyseCmd = 'node index.js';
  * SCRAPE
  */
 // const matchIds = await getMatchIds('today');
-const matchIds = await getMatchIds('nextDay');
-await buildStats(matchIds);
-// await buildStats(['CACYGDS4']);
+// const matchIds = await getMatchIds('nextDay');
+// await buildStats(matchIds);
+await buildStats(['2LMzZvkE']);
 
 /**
  * SAVE RESULTS
