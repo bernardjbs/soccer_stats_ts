@@ -1,4 +1,5 @@
-import { getMatchIds, buildStats} from '@utils/scrape.js';
+import { buildStats } from '@utils/scrape.js';
+import { getMatchIds } from '@scrape/v2/getMatchIds.js';
 import { executeCommand } from '@utils/executeCommand.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -20,7 +21,8 @@ const analyseCmd = 'node index.js';
 // const matchIds = await getMatchIds('today');
 const matchIds = await getMatchIds('nextDay');
 await buildStats(matchIds);
-// await buildStats(['CACYGDS4']);
+
+// await buildStats(['KbYVJVpC', 'tb6j62Ir']);
 
 /**
  * SAVE RESULTS
@@ -33,4 +35,3 @@ await executeCommand(saveResultsCmd, saveResultsCwd);
 await executeCommand(analyseCmd, analyseCwd);
 
 process.exit();
-

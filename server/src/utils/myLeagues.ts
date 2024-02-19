@@ -31,6 +31,7 @@ export const myLeagues = [
   { country: 'EUROPE', competition: 'Champions League - Group Stage' },
   { country: 'EUROPE', competition: 'Champions League - Qualification' },
   { country: 'EUROPE', competition: 'Champions League - Play Offs' },
+  { country: 'EUROPE', competition: 'Europa League - Group Stage' },
   { country: 'EUROPE', competition: 'Europa Conference League - Group Stage' },
   { country: 'EUROPE', competition: 'Europa Conference League - Qualification' },
   { country: 'EUROPE', competition: 'Europa Conference League - Play Offs' },
