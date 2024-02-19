@@ -2,6 +2,7 @@ import playwright from 'playwright';
 import { processEnv } from '@utils/processEnv.js';
 import { myLeagues } from '@utils/myLeagues.js';
 import { matchExists } from '@utils/scrapeController.js';
+import { random, delay, strToDateTime } from '@utils/helpers.js';
 
 import Colors from 'colors.ts';
 Colors.enable();
@@ -20,7 +21,7 @@ export const getMatchIds = async (day: string) => {
 
   if (day === 'nextDay') {
     await page.locator('.calendar__navigation--tomorrow').click();
-    await page.waitForSelector('.event__header.top');
+    await page.waitForSelector('.wclLeagueHeader');
   }
 
   const sportNameDivs = page.locator('.sportName.soccer > div');
@@ -33,9 +34,12 @@ export const getMatchIds = async (day: string) => {
   for (let i = 0; i < sportNameDivCount; i++) {
     const eventHeaderClass = await sportNameDivs.nth(i).getAttribute('class');
     const eventMatchId = await sportNameDivs.nth(i).getAttribute('id');
-    if (eventHeaderClass?.includes('event__header')) {
-      const country = await sportNameDivs.nth(i).locator('.event__title--type').innerText();
-      const competition = await sportNameDivs.nth(i).locator('.event__title--name').innerText();
+    if (eventHeaderClass?.includes('wclLeagueHeader')) {
+      const country = await sportNameDivs
+        .nth(i)
+        .locator('.event__titleBox .wclLeagueHeader__overline')
+        .innerText();
+      const competition = await sportNameDivs.nth(i).locator('.event__titleBox a').innerText();
 
       const myLeague = myLeagues.find(
         (league) => league.country === country && league.competition === competition
