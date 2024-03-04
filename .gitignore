@@ -1,3 +1,4 @@
 node_modules
 .env
+.env.v2
 build

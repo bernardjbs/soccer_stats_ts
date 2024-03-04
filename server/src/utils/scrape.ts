@@ -20,11 +20,17 @@ const match = async (matchId: string) => {
   const page = await browser.newPage();
   await page.goto(`${processEnv().SCRAPE_SOURCE_01}/match/${matchId}/#/match-summary`);
 
-  const matchStart: Date = strToDateTime(await page.locator('.duelParticipant__startTime').innerText(), '.', ':');
+  const matchStart: Date = strToDateTime(
+    await page.locator('.duelParticipant__startTime').innerText(),
+    '.',
+    ':'
+  );
   const homeTeam: string = await page.locator('.duelParticipant__home').innerText();
   const awayTeam: string = await page.locator('.duelParticipant__away').innerText();
   const competition: string = await page.locator('.tournamentHeader__country').innerText();
-  console.log(`\n${competition} - ${homeTeam} vs ${awayTeam} *** match starts at: ${matchStart}`.red.bg_green);
+  console.log(
+    `\n${competition} - ${homeTeam} vs ${awayTeam} *** match starts at: ${matchStart}`.red.bg_green
+  );
 
   let hotStat: string = '';
 
@@ -61,10 +67,19 @@ const match = async (matchId: string) => {
     if ((await formButton.count()) > 0) {
       await page.locator('a[href="#/standings/form"]').click();
       await page.locator('a[href="#/standings/form/home"]').click();
-      const standingHomeFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
-      const homeFormTeam1 = await standingHomeFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
-      const homeFormTeam1Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
-      const homeFormTeam2Rank = (await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
+      const standingHomeFormTeams = page
+        .locator('div[class="ui-table__body"]')
+        .locator('div[class="ui-table__row table__row--selected "]');
+      const homeFormTeam1 = await standingHomeFormTeams
+        .locator('div[class="tableCellParticipant__block"]')
+        .nth(0)
+        .innerText();
+      const homeFormTeam1Rank = (
+        await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()
+      ).replace('.', '');
+      const homeFormTeam2Rank = (
+        await standingHomeFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()
+      ).replace('.', '');
 
       if (homeTeam === homeFormTeam1) {
         homeForm = {
@@ -79,10 +94,19 @@ const match = async (matchId: string) => {
       }
 
       await page.locator('a[href="#/standings/form/away"]').click();
-      const standingAwayFormTeams = page.locator('div[class="ui-table__body"]').locator('div[class="ui-table__row table__row--selected "]');
-      const awayFormTeam1 = await standingAwayFormTeams.locator('div[class="tableCellParticipant__block"]').nth(0).innerText();
-      const awayFormTeam1Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()).replace('.', '');
-      const awayFormTeam2Rank = (await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()).replace('.', '');
+      const standingAwayFormTeams = page
+        .locator('div[class="ui-table__body"]')
+        .locator('div[class="ui-table__row table__row--selected "]');
+      const awayFormTeam1 = await standingAwayFormTeams
+        .locator('div[class="tableCellParticipant__block"]')
+        .nth(0)
+        .innerText();
+      const awayFormTeam1Rank = (
+        await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(0).innerText()
+      ).replace('.', '');
+      const awayFormTeam2Rank = (
+        await standingAwayFormTeams.locator('div[class="tableCellRank"]').nth(1).innerText()
+      ).replace('.', '');
 
       if (homeTeam === awayFormTeam1) {
         awayForm = {
@@ -189,8 +213,18 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
 
     if ((await homeTeamScoreCount) == 0 || (await awayTeamScoreCount) == 0) continue;
 
-    const homeTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(0).innerText();
-    const awayTeamScore = await matchCollection.nth(i).locator('.h2h__result').locator('span').nth(1).innerText();
+    const homeTeamScore = await matchCollection
+      .nth(i)
+      .locator('.h2h__result')
+      .locator('span')
+      .nth(0)
+      .innerText();
+    const awayTeamScore = await matchCollection
+      .nth(i)
+      .locator('.h2h__result')
+      .locator('span')
+      .nth(1)
+      .innerText();
 
     if ((await matchCollection.nth(i).locator('.wld').count()) > 0) {
       outcome = await matchCollection.nth(i).locator('.wld').innerText();
@@ -215,13 +249,16 @@ const getStats = async (matches: playwright.Locator, page: playwright.Page, last
       continue;
     }
 
-    const [matchSummary] = await Promise.all([page.waitForEvent('popup'), await matchCollection.nth(i).click()]);
+    const [matchSummary] = await Promise.all([
+      page.waitForEvent('popup'),
+      await matchCollection.nth(i).click()
+    ]);
     await matchSummary.waitForLoadState();
 
-    const statsElCount = await matchSummary.locator('a[href="#/match-summary/match-statistics"]').count();
+    const statsElCount = await matchSummary.locator('[role="tab"][name="Stats"]').count();
     let matchStats: MatchStatsInterface[] = [];
     if (statsElCount > 0) {
-      await matchSummary.locator('a[href="#/match-summary/match-statistics"]').click();
+      await matchSummary.locator('[role="tab"][name="Stats"]').click();
       await delay(1000);
       const statsCategory = matchSummary.locator('.stat__categoryName');
       const statsHome = matchSummary.locator('.stat__homeValue');

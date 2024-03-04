@@ -12,7 +12,7 @@ console.log(`Matches with empty results: ${matches.length}`);
 const updateResult = async (matchId: string) => {
   console.log(`Saving result for match: ${matchId}`);
 
-  const browser = await chromium.launch({ headless: true }); //Headless false = With browser
+  const browser = await chromium.launch({ headless: false }); //Headless false = With browser
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -24,7 +24,7 @@ const updateResult = async (matchId: string) => {
   });
 
   if (matchStatus === 'Finished') {
-    const statsBtnLocator = page.locator('a[href="#/match-summary/match-statistics"]');
+    const statsBtnLocator = page.getByRole('link', { name: 'Stats' });
 
     if ((await statsBtnLocator.count()) == 0) {
       console.log(`Deleting match ${matchId}`);
