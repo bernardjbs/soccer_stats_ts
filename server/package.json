@@ -45,6 +45,7 @@
   "_moduleAliases": {
     "@utils": "./build/utils",
     "@config": "./build/config",
+    "@models": "./build/models", 
     "@root": "."
   }
 }

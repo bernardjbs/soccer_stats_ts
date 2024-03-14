@@ -11,7 +11,7 @@ export const getMatchIds = async (day: string) => {
   let matchIds = [];
   console.log('Selecting Competitions...'.green.bold);
   const browser = await playwright.chromium.launch({
-    headless: false // setting this to true will not run the UI
+    headless: true // setting this to true will not run the UI
   });
 
   const page = await browser.newPage();

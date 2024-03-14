@@ -31,7 +31,7 @@ const saveResult = async (matchId: string) => {
     return document.querySelector('.fixedScore__status')?.textContent;
   });
 
-  if (matchStatus === 'Finished') {
+  if (matchStatus == 'Finished' || matchStatus == 'After Penalties' || matchStatus == 'After Extra Time') {
     const statsBtnLocator = page.locator('a[href="#/match-summary/match-statistics"]');
     if ((await statsBtnLocator.count()) == 0) return 0;
 

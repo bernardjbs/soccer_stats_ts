@@ -4,7 +4,7 @@ import { delay } from '@utils/helpers.js';
 import { match } from 'assert';
 
 const browser = await playwright.chromium.launch({
-  headless: false // setting this to true will not run the UI
+  headless: true // setting this to true will not run the UI
 });
 
 const page = await browser.newPage();
